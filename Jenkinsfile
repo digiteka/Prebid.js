@@ -26,24 +26,7 @@ node {
             } catch (Exception e) {
                 echo "A priori pas de cache des branches..."
             }
-            
-            sh('git fetch -p')
-            sh('git checkout ' +env.BRANCH_NAME+' 2>/dev/null || git checkout -b ' +env.BRANCH_NAME)
-            sh('git branch -r')
-            sh('cp ../build/dist/prebid.js app/library/dtkplayer/ext_library/PrebidLibrary.js')
-            
-            withCredentials([usernamePassword(credentialsId: 'jenkins_access_repos', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                sh('git config --global user.email "jenkins@jenkins.com"')
-                sh('git config --global user.name "$USERNAME"')
-                sh('git commit app/library/dtkplayer/ext_library/PrebidLibrary.js -m "Update Prebid Library from Jenkins"')
-                
-                //sh 'echo $PASSWORD'
-                // also available as a Groovy variable
-                //echo USERNAME
-                // or inside double quotes for string interpolation
-                echo "username is $USERNAME"
-                sh('git push origin ' +env.BRANCH_NAME)
-            }
+          
           
         }
     }
