@@ -30,12 +30,12 @@ node {
             sh('git fetch -p')
             sh('git checkout ' +env.BRANCH_NAME+' 2>/dev/null || git checkout -b ' +env.BRANCH_NAME)
             sh('git branch -r')
-            sh('cp ../build/dist/prebid.js app/library/dtkplayer/addons/PrebidLibrary.js')
+            sh('cp ../build/dist/prebid.js app/library/dtkplayer/ext_library/PrebidLibrary.js')
             
-            withCredentials([usernamePassword(credentialsId: '54c5b16a-e2aa-41f1-aff7-169154fd52f5', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            withCredentials([usernamePassword(credentialsId: 'jenkins_access_repos', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                 sh('git config --global user.email "jenkins@jenkins.com"')
                 sh('git config --global user.name "$USERNAME"')
-                sh('git commit app/library/dtkplayer/addons/PrebidLibrary.js -m "Update Prebid Library from Jenkins"')
+                sh('git commit app/library/dtkplayer/ext_library/PrebidLibrary.js -m "Update Prebid Library from Jenkins"')
                 
                 //sh 'echo $PASSWORD'
                 // also available as a Groovy variable
