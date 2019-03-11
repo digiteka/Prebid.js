@@ -1,4 +1,5 @@
 [
+  "currency",
   "appnexusBidAdapter",
   "freewheel-sspBidAdapter",
   "spotxBidAdapter",
