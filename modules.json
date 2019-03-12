@@ -4,5 +4,6 @@
   "spotxBidAdapter",
   "telariaBidAdapter",
   "rubiconBidAdapter",
-  "dfpAdServerVideo"
+  "dfpAdServerVideo",
+  "consentManagement"
 ]
