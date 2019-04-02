@@ -1,6 +1,7 @@
 [
   "appnexusBidAdapter",
   "freewheel-sspBidAdapter",
+  "audienceNetwork",
   "spotxBidAdapter",
   "telariaBidAdapter",
   "rubiconBidAdapter",
