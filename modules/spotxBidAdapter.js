@@ -66,7 +66,7 @@ export const spec = {
    * @param {BidRequest[]} bidRequests A non-empty list of bid requests which should be sent to the Server.
    * @return ServerRequest Info describing the request to the server.
    */
-  buildRequests: function(bidRequests, bidderRequest) {
+  buildRequests: function(bidRequests, bidderRequest) {console.log('HBDEBUG SPOTX BUILDREQUESTS PARAMS', bidRequests, bidderRequest);
     const page = bidderRequest.refererInfo.referer;
     const isPageSecure = !!page.match(/^https:/)
 
@@ -230,7 +230,12 @@ export const spec = {
     // Only add the user object if it's not empty
     if (!utils.isEmpty(userExt)) {
       requestPayload.user = { ext: userExt };
-    }
+    }console.log('HBDEBUG SPOTX BUILDREQUESTS RETURN', {
+      method: 'POST',
+      url: URL + channelId,
+      data: requestPayload,
+      bidRequest: bidderRequest
+    });
 
     return {
       method: 'POST',
@@ -246,7 +251,7 @@ export const spec = {
    * @param {*} serverResponse A successful response from the server.
    * @return {Bid[]} An array of bids which were nested inside the server.
    */
-  interpretResponse: function(serverResponse, bidderRequest) {
+  interpretResponse: function(serverResponse, bidderRequest) {console.log('HBDEBUG SPOTX INTERPRETRESPONSE PARAMS', serverResponse, bidderRequest);
     const bidResponses = [];
     const serverResponseBody = serverResponse.body;
 
@@ -318,7 +323,7 @@ export const spec = {
           bidResponses.push(bid);
         })
       });
-    }
+    }console.log('HBDEBUG SPOTX INTERPRETRESPONSE RETURN', bidResponses);
 
     return bidResponses;
   }

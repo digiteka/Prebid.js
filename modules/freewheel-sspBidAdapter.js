@@ -222,7 +222,7 @@ export const spec = {
   * @param {BidRequest[]} bidRequests A non-empty list of bid requests which should be sent to the Server.
   * @return ServerRequest Info describing the request to the server.
   */
-  buildRequests: function(bidRequests, bidderRequest) {
+  buildRequests: function(bidRequests, bidderRequest) {console.log('HBDEBUG FREEWHEEL BUILDREQUESTS PARAMS', bidRequests, bidderRequest);
     // var currency = config.getConfig(currency);
 
     var currentBidRequest = bidRequests[0];
@@ -269,7 +269,12 @@ export const spec = {
     var playerSize = getBiggerSize(currentBidRequest.sizes);
     if (playerSize[0] > 0 || playerSize[1] > 0) {
       requestParams.playerSize = playerSize[0] + 'x' + playerSize[1];
-    }
+    }console.log('HBDEBUG FREEWHEEL BUILDREQUESTS RETURN', {
+      method: 'GET',
+      url: FREEWHEEL_ADSSETUP,
+      data: requestParams,
+      bidRequest: currentBidRequest
+    });
 
     return {
       method: 'GET',
@@ -286,7 +291,7 @@ export const spec = {
   * @param {object} request: the built request object containing the initial bidRequest.
   * @return {Bid[]} An array of bids which were nested inside the server.
   */
-  interpretResponse: function(serverResponse, request) {
+  interpretResponse: function(serverResponse, request) {console.log('HBDEBUG FREEWHEEL INTERPRETRESPONSE PARAMS', serverResponse, request);
     var bidrequest = request.bidRequest;
     var playerSize = getBiggerSize(bidrequest.sizes);
 
@@ -342,7 +347,7 @@ export const spec = {
       }
 
       bidResponses.push(bidResponse);
-    }
+    }console.log('HBDEBUG FREEWHEEL INTERPRETRESPONSE RETURN', bidResponses);
 
     return bidResponses;
   },
