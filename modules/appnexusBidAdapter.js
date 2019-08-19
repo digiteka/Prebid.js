@@ -49,7 +49,7 @@ export const spec = {
    * @param {BidRequest[]} bidRequests A non-empty list of bid requests which should be sent to the Server.
    * @return ServerRequest Info describing the request to the server.
    */
-  buildRequests: function(bidRequests, bidderRequest) {console.log('HBDEBUG APPNEXUS BUILDREQUESTS PARAMS', json.dumps(bidRequests), json.dumps(bidderRequest));
+  buildRequests: function(bidRequests, bidderRequest) {console.log('HBDEBUG APPNEXUS BUILDREQUESTS PARAMS', JSON.stringify(bidRequests), JSON.stringify(bidderRequest));
     const tags = bidRequests.map(bidToTag);
     const userObjBid = find(bidRequests, hasUserInfo);
     let userObj;
@@ -117,7 +117,7 @@ export const spec = {
       payload.referrer_detection = refererinfo;
     }
 
-    const payloadString = JSON.stringify(payload);console.log('HBDEBUG APPNEXUS BUILDREQUESTS RETURN', json.dumps({
+    const payloadString = JSON.stringify(payload);console.log('HBDEBUG APPNEXUS BUILDREQUESTS RETURN', JSON.stringify({
       method: 'POST',
       url: URL,
       data: payloadString,
@@ -137,7 +137,7 @@ export const spec = {
    * @param {*} serverResponse A successful response from the server.
    * @return {Bid[]} An array of bids which were nested inside the server.
    */
-  interpretResponse: function(serverResponse, {bidderRequest}) {console.log('HBDEBUG APPNEXUS INTERPRETRESPONSE PARAMS', json.dumps(serverResponse), json.dumps(bidderRequest));
+  interpretResponse: function(serverResponse, {bidderRequest}) {console.log('HBDEBUG APPNEXUS INTERPRETRESPONSE PARAMS', JSON.stringify(serverResponse), JSON.stringify(bidderRequest));
     serverResponse = serverResponse.body;
     const bids = [];
     if (!serverResponse || serverResponse.error) {
@@ -158,7 +158,7 @@ export const spec = {
           }
         }
       });
-    }console.log('HBDEBUG APPNEXUS INTERPRETRESPONSE RETURN', json.dumps(bids));
+    }console.log('HBDEBUG APPNEXUS INTERPRETRESPONSE RETURN', JSON.stringify(bids));
     return bids;
   },
 
