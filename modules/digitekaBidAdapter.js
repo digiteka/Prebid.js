@@ -55,7 +55,7 @@ export const spec = {
             url: URL,
             data: payloadString,
             bidRequest: bidderRequest
-        });
+        }));
         return {
             method: 'GET',
             url: URL,

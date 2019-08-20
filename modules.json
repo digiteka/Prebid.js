@@ -7,5 +7,6 @@
   "telariaBidAdapter",
   "rubiconBidAdapter",
   "oneVideoBidAdapter",
+  "digitekaBidAdapter",
   "dfpAdServerVideo"
 ]
