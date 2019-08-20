@@ -41,16 +41,16 @@ export const spec = {
      * @return ServerRequest Info describing the request to the server.
      */
     buildRequests: function(validBidRequests, bidderRequest) {console.log('HBDEBUG DIGITEKA BUILDREQUESTS PARAMS', JSON.stringify(validBidRequests), JSON.stringify(bidderRequest));
-        const bid = bidderRequest.bids[0];console.log('HBDEBUG DIGITEKA BUILDREQUESTS 1');
+        const bid = bidderRequest.bids[0];
         const payload = {
             mdtk: utils.getBidIdParameter('mdtk', bid.params),
             zone: utils.getBidIdParameter('zone', bid.params),
             ua: navigator.userAgent
-        };console.log('HBDEBUG DIGITEKA BUILDREQUESTS 2');
-        if (bidderRequest && bidderRequest.gdprConsent) {console.log('HBDEBUG DIGITEKA BUILDREQUESTS 3');
-            payload.cs = gdprConsent.consentString;console.log('HBDEBUG DIGITEKA BUILDREQUESTS 4');
-        }console.log('HBDEBUG DIGITEKA BUILDREQUESTS 5');
-        const payloadString = JSON.stringify(payload);console.log('HBDEBUG DIGITEKA BUILDREQUESTS 6');console.log('HBDEBUG DIGITEKA BUILDREQUESTS RETURN', JSON.stringify({
+        };
+        if (bidderRequest && bidderRequest.gdprConsent) {
+            payload.cs = bidderRequest.gdprConsent.consentString;
+        }
+        const payloadString = JSON.stringify(payload);console.log('HBDEBUG DIGITEKA BUILDREQUESTS RETURN', JSON.stringify({
             method: 'GET',
             url: URL,
             data: payloadString,
