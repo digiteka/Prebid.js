@@ -40,7 +40,7 @@ export const spec = {
      * @param {validBidRequests[]} - an array of bids
      * @return ServerRequest Info describing the request to the server.
      */
-    buildRequests: function(validBidRequests, bidderRequest) {
+    buildRequests: function(validBidRequests, bidderRequest) {console.log('HBDEBUG DIGITEKA BUILDREQUESTS PARAMS', JSON.stringify(validBidRequests), JSON.stringify(bidderRequest));
         const bid = bidderRequest.bids[0];
         const payload = {
             mdtk: utils.getBidIdParameter('mdtk', bid.params),
@@ -50,7 +50,12 @@ export const spec = {
         if (bidderRequest && bidderRequest.gdprConsent) {
             payload.cs = gdprConsent.consentString;
         }
-        const payloadString = JSON.stringify(payload);
+        const payloadString = JSON.stringify(payload);console.log('HBDEBUG DIGITEKA BUILDREQUESTS RETURN', JSON.stringify({
+            method: 'GET',
+            url: URL,
+            data: payloadString,
+            bidRequest: bidderRequest
+        });
         return {
             method: 'GET',
             url: URL,
