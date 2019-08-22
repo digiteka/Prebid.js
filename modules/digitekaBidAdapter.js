@@ -3,7 +3,7 @@ import {config} from 'src/config';
 import {registerBidder} from 'src/adapters/bidderFactory';
 import {VIDEO} from "../src/mediaTypes";
 const BIDDER_CODE = 'digiteka';
-const URL = '//www.ultimedia.com/deliver/ad/hb/';
+const URL = '//www.ultimedia.com/ad/hb/';
 export const spec = {
     code: BIDDER_CODE,
     supportedMediaTypes: [VIDEO],
