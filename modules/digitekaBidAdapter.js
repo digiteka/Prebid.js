@@ -3,7 +3,8 @@ import {config} from 'src/config';
 import {registerBidder} from 'src/adapters/bidderFactory';
 import {VIDEO} from "../src/mediaTypes";
 const BIDDER_CODE = 'digiteka';
-const URL = '//www.ultimedia.com/deliver/ad/hb/';
+//const URL = '//www.ultimedia.com/deliver/ad/hb/';
+const URL = '//web09.ultimedia.com/hb.php';
 export const spec = {
     code: BIDDER_CODE,
     supportedMediaTypes: [VIDEO],
@@ -70,7 +71,7 @@ export const spec = {
      * @param {ServerResponse} serverResponse A successful response from the server.
      * @return {Bid[]} An array of bids which were nested inside the server.
      */
-    interpretResponse: function(serverResponse, bidderRequest) {
+    interpretResponse: function(serverResponse, bidderRequest) {console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE PARAMS', JSON.stringify(serverResponse), JSON.stringify(bidderRequest));
         serverResponse = serverResponse.body;
         const bids = [];
         if (!serverResponse || serverResponse.error) {
@@ -80,18 +81,21 @@ export const spec = {
             return bids;
         }
 
-        if (serverResponse.tags) {
-            serverResponse.tags.forEach(serverBid => {
-                const rtbBid = getRtbBid(serverBid);
-                if (rtbBid) {
-                    if (rtbBid.cpm !== 0 && includes(this.supportedMediaTypes, rtbBid.ad_type)) {
-                        const bid = newBid(serverBid, rtbBid, bidderRequest);
-                        bid.mediaType = parseMediaType(rtbBid);
-                        bids.push(bid);
-                    }
-                }
-            });
-        }
+        if (serverResponse.id) {
+            const bid = {
+                'requestId': bidderRequest.bidRequest.bids[0].bidId,
+                'cpm': serverResponse.price,
+                'width': bidderRequest.bidRequest.bids[0].mediaTypes.video.playerSize[0],
+                'height': bidderRequest.bidRequest.bids[0].mediaTypes.video.playerSize[1],
+                'ttl': 360,
+                'creativeId': serverResponse.id,
+                'netRevenue': true,
+                'currency': serverResponse.currency,
+                'vastUrl': serverResponse.tag,
+                'mediaType': "video"
+            };
+            bids.push(bid);
+        }console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE RETURN', JSON.stringify(bids));
         return bids;
     },
 
@@ -102,7 +106,7 @@ export const spec = {
      * @param {ServerResponse[]} serverResponses List of server's responses.
      * @return {UserSync[]} The user syncs which should be dropped.
      */
-    getUserSyncs: function(syncOptions, serverResponses) {
+    /*getUserSyncs: function(syncOptions, serverResponses) {
         const syncs = []
         if (syncOptions.iframeEnabled) {
             syncs.push({
@@ -117,7 +121,7 @@ export const spec = {
             });
         }
         return syncs;
-    },
+    },*/
 
     /**
      * Register bidder specific code, which will execute if bidder timed out after an auction
