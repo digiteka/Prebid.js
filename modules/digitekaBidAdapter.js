@@ -3,8 +3,7 @@ import {config} from 'src/config';
 import {registerBidder} from 'src/adapters/bidderFactory';
 import {VIDEO} from "../src/mediaTypes";
 const BIDDER_CODE = 'digiteka';
-//const URL = '//www.ultimedia.com/deliver/ad/hb/';
-const URL = '//web10.ultimedia.com/hb.php';
+const URL = '//www.ultimedia.com/deliver/ad/hb/';
 export const spec = {
     code: BIDDER_CODE,
     supportedMediaTypes: [VIDEO],
@@ -41,7 +40,7 @@ export const spec = {
      * @param {validBidRequests[]} - an array of bids
      * @return ServerRequest Info describing the request to the server.
      */
-    buildRequests: function(validBidRequests, bidderRequest) {console.log('HBDEBUG DIGITEKA BUILDREQUESTS PARAMS', JSON.stringify(validBidRequests), JSON.stringify(bidderRequest));
+    buildRequests: function(validBidRequests, bidderRequest) {
         const bid = bidderRequest.bids[0];
         const payload = {
             mdtk: utils.getBidIdParameter('mdtk', bid.params),
@@ -51,12 +50,7 @@ export const spec = {
         if (bidderRequest && bidderRequest.gdprConsent) {
             payload.cs = bidderRequest.gdprConsent.consentString;
         }
-        const payloadString = JSON.stringify(payload);console.log('HBDEBUG DIGITEKA BUILDREQUESTS RETURN', JSON.stringify({
-            method: 'GET',
-            url: URL,
-            data: payloadString,
-            bidRequest: bidderRequest
-        }));
+        const payloadString = JSON.stringify(payload);
         return {
             method: 'GET',
             url: URL,
@@ -71,31 +65,31 @@ export const spec = {
      * @param {ServerResponse} serverResponse A successful response from the server.
      * @return {Bid[]} An array of bids which were nested inside the server.
      */
-    interpretResponse: function(serverResponse, bidderRequest) {console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE PARAMS', JSON.stringify(serverResponse), JSON.stringify(bidderRequest), serverResponse, bidderRequest);
-        serverResponse = serverResponse.body;console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 1');
+    interpretResponse: function(serverResponse, bidderRequest) {
+        serverResponse = serverResponse.body;
         const bids = [];
         if (!serverResponse || serverResponse.error) {
             let errorMessage = `in response for ${bidderRequest.bidderCode} adapter`;
             if (serverResponse && serverResponse.error) { errorMessage += `: ${serverResponse.error}`; }
             utils.logError(errorMessage);
             return bids;
-        }console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 2');
+        }
 
-        if (serverResponse.id) {console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 3');
+        if (serverResponse.id) {
             const bid = {
                 'requestId': bidderRequest.bidRequest.bids[0].bidId,
                 'cpm': serverResponse.price,
-                'width': bidderRequest.bidRequest.bids[0].mediaTypes.video.playerSize[0],
-                'height': bidderRequest.bidRequest.bids[0].mediaTypes.video.playerSize[1],
+                'width': bidderRequest.bidRequest.bids[0].mediaTypes.video.playerSize[0][0],
+                'height': bidderRequest.bidRequest.bids[0].mediaTypes.video.playerSize[0][1],
                 'ttl': 360,
                 'creativeId': serverResponse.id,
                 'netRevenue': true,
                 'currency': serverResponse.currency,
                 'vastUrl': serverResponse.tag,
                 'mediaType': "video"
-            };console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 4');
-            bids.push(bid);console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 5');
-        }console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE RETURN', JSON.stringify(bids));
+            };
+            bids.push(bid);
+        }
         return bids;
     },
 
