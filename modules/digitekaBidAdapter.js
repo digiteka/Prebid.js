@@ -4,7 +4,7 @@ import {registerBidder} from 'src/adapters/bidderFactory';
 import {VIDEO} from "../src/mediaTypes";
 const BIDDER_CODE = 'digiteka';
 //const URL = '//www.ultimedia.com/deliver/ad/hb/';
-const URL = '//web09.ultimedia.com/hb.php';
+const URL = '//web10.ultimedia.com/hb.php';
 export const spec = {
     code: BIDDER_CODE,
     supportedMediaTypes: [VIDEO],
@@ -71,17 +71,17 @@ export const spec = {
      * @param {ServerResponse} serverResponse A successful response from the server.
      * @return {Bid[]} An array of bids which were nested inside the server.
      */
-    interpretResponse: function(serverResponse, bidderRequest) {console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE PARAMS', JSON.stringify(serverResponse), JSON.stringify(bidderRequest));
-        serverResponse = serverResponse.body;
+    interpretResponse: function(serverResponse, bidderRequest) {console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE PARAMS', JSON.stringify(serverResponse), JSON.stringify(bidderRequest), serverResponse, bidderRequest);
+        serverResponse = serverResponse.body;console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 1');
         const bids = [];
         if (!serverResponse || serverResponse.error) {
             let errorMessage = `in response for ${bidderRequest.bidderCode} adapter`;
             if (serverResponse && serverResponse.error) { errorMessage += `: ${serverResponse.error}`; }
             utils.logError(errorMessage);
             return bids;
-        }
+        }console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 2');
 
-        if (serverResponse.id) {
+        if (serverResponse.id) {console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 3');
             const bid = {
                 'requestId': bidderRequest.bidRequest.bids[0].bidId,
                 'cpm': serverResponse.price,
@@ -93,8 +93,8 @@ export const spec = {
                 'currency': serverResponse.currency,
                 'vastUrl': serverResponse.tag,
                 'mediaType': "video"
-            };
-            bids.push(bid);
+            };console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 4');
+            bids.push(bid);console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE 5');
         }console.log('HBDEBUG DIGITEKA INTERPRETRESPONSE RETURN', JSON.stringify(bids));
         return bids;
     },
