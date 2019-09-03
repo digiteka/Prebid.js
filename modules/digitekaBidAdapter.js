@@ -37,7 +37,8 @@ export const spec = {
     /**
      * Make a server request from the list of BidRequests.
      *
-     * @param {validBidRequests[]} - an array of bids
+     * @param {validBidRequests[]} validBidRequests - an array of bids
+     * @param {bidderRequest} bidderRequest A bidder Request.
      * @return ServerRequest Info describing the request to the server.
      */
     buildRequests: function(validBidRequests, bidderRequest) {
@@ -63,6 +64,7 @@ export const spec = {
      * Unpack the response from the server into a list of bids.
      *
      * @param {ServerResponse} serverResponse A successful response from the server.
+     * @param {bidderRequest} bidderRequest A bidder Request.
      * @return {Bid[]} An array of bids which were nested inside the server.
      */
     interpretResponse: function(serverResponse, bidderRequest) {
@@ -119,7 +121,7 @@ export const spec = {
 
     /**
      * Register bidder specific code, which will execute if bidder timed out after an auction
-     * @param {data} Containing timeout specific data
+     * @param {data} data - Containing timeout specific data
      */
     onTimeout: function(data) {
         // Bidder specifc code
@@ -127,7 +129,7 @@ export const spec = {
 
     /**
      * Register bidder specific code, which will execute if a bid from this bidder won the auction
-     * @param {Bid} The bid that won the auction
+     * @param {Bid} bid - The bid that won the auction
      */
     onBidWon: function(bid) {
         // Bidder specific code
@@ -135,7 +137,7 @@ export const spec = {
 
     /**
      * Register bidder specific code, which will execute when the adserver targeting has been set for a bid from this bidder
-     * @param {Bid} The bid of which the targeting has been set
+     * @param {Bid} bid - The bid of which the targeting has been set
      */
     onSetTargeting: function(bid) {
         // Bidder specific code
