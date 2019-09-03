@@ -52,8 +52,9 @@ export const spec = {
             payload.cs = bidderRequest.gdprConsent.consentString;
         }
         const payloadString = JSON.stringify(payload);
+        console.log(payload);
         return {
-            method: 'GET',
+            method: 'POST',
             url: URL,
             data: payloadString,
             bidRequest: bidderRequest
