@@ -19,12 +19,20 @@ export const spec = {
             utils.logError(BIDDER_CODE + ': params is not defined or is incorrect in the bidder settings.');
             return false;
         }
-        if (!utils.getBidIdParameter('mdtk', bid.params)) {
-            utils.logError(BIDDER_CODE + ': mdtk is not present in bidder params');
+        if (!utils.getBidIdParameter('id', bid.params)) {
+            utils.logError(BIDDER_CODE + ': id is not present in bidder params');
             return false;
         }
-        if (!utils.getBidIdParameter('zone', bid.params)) {
-            utils.logError(BIDDER_CODE + ': zone is not present in bidder params');
+        if (!utils.getBidIdParameter('price', bid.params)) {
+            utils.logError(BIDDER_CODE + ': price is not present in bidder params');
+            return false;
+        }
+        if (!utils.getBidIdParameter('currency', bid.params)) {
+            utils.logError(BIDDER_CODE + ': currency is not present in bidder params');
+            return false;
+        }
+        if (!utils.getBidIdParameter('tag', bid.params)) {
+            utils.logError(BIDDER_CODE + ': tag is not present in bidder params');
             return false;
         }
         if (!utils.deepAccess(bid, 'mediaTypes.video')) {
@@ -44,8 +52,10 @@ export const spec = {
     buildRequests: function(validBidRequests, bidderRequest) {
         const bid = bidderRequest.bids[0];
         const payload = {
-            mdtk: utils.getBidIdParameter('mdtk', bid.params),
-            zone: utils.getBidIdParameter('zone', bid.params),
+            id: utils.getBidIdParameter('id', bid.params),
+            price: utils.getBidIdParameter('price', bid.params),
+            currency: utils.getBidIdParameter('currency', bid.params),
+            tag: utils.getBidIdParameter('tag', bid.params),
             ua: navigator.userAgent
         };
         if (bidderRequest && bidderRequest.gdprConsent) {
@@ -53,7 +63,7 @@ export const spec = {
         }
         const payloadString = JSON.stringify(payload);
         return {
-            method: 'POST',
+            method: 'GET',
             url: URL,
             data: payloadString,
             bidRequest: bidderRequest
