@@ -39,7 +39,7 @@ export const spec = {
             utils.logError(BIDDER_CODE + ': mediaTypes.video is not present in the bidder settings.');
             return false;
         }
-        return !!(bid.params.mdtk) && !!(bid.params.zone);
+        return !!(bid.params.id) && !!(bid.params.price) && !!(bid.params.currency) && !!(bid.params.tag);
     },
 
     /**
