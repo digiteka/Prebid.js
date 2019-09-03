@@ -63,9 +63,9 @@ export const spec = {
         }
         const payloadString = JSON.stringify(payload);
         return {
-            method: 'GET',
+            method: 'POST',
             url: URL,
-            data: payloadString,
+            data: payload,
             bidRequest: bidderRequest
         };
     },
