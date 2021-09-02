@@ -54,6 +54,16 @@ function wrapURI(uri, impUrl) {
 }
 
 /**
+ * Function which change the AdSystem Element from the VAST XML Response
+ *
+ * @param {string} vastXml The XML Vast Response
+ * @return XML.
+ */
+function wrapVastXml(vastXml) {
+  return vastXml.replace(/<AdSystem.*>.*<\/AdSystem>/, "<AdSystem>prebid.org wrapper</AdSystem>");
+}
+
+/**
  * Wraps a bid in the format expected by the prebid-server endpoints, or returns null if
  * the bid can't be converted cleanly.
  *
@@ -61,7 +71,7 @@ function wrapURI(uri, impUrl) {
  * @param index
  */
 function toStorageRequest(bid, {index = auctionManager.index} = {}) {
-  const vastValue = bid.vastXml ? bid.vastXml : wrapURI(bid.vastUrl, bid.vastImpUrl);
+  const vastValue = bid.vastXml ? wrapVastXml(bid.vastXml) : wrapURI(bid.vastUrl, bid.vastImpUrl);
   const auction = index.getAuction(bid);
 
   let payload = {
