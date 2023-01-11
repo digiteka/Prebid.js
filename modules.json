@@ -32,5 +32,6 @@
   "tripleliftBidAdapter",
   "yahoosspBidAdapter",
   "userId",
-  "id5IdSystem"
+  "id5IdSystem",
+  "seedTagBidAdapter"
 ]
