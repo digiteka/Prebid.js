@@ -9,6 +9,7 @@
   "criteoBidAdapter",
   "digitekaVideoBidAdapter",
   "freewheel-sspBidAdapter",
+  "greenbidsAnalyticsAdapter",
   "improvedigitalBidAdapter",
   "ixBidAdapter",
   "mediasquareBidAdapter",
@@ -25,6 +26,7 @@
   "yahoosspBidAdapter",
 
   "adlooxRtdProvider",
+  "greenbidsRtdProvider",
   "intersectionRtdProvider",
   "iasRtdProvider",
   "sirdataRtdProvider",
