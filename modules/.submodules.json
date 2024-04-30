@@ -39,6 +39,7 @@
       "teadsIdSystem",
       "tncIdSystem",
       "utiqSystem",
+      "utiqMtpIdSystem",
       "uid2IdSystem",
       "euidIdSystem",
       "unifiedIdSystem",
@@ -48,7 +49,8 @@
       "adqueryIdSystem",
       "gravitoIdSystem",
       "freepassIdSystem",
-      "operaadsIdSystem"
+      "operaadsIdSystem",
+      "mygaruIdSystem"
     ],
     "adpod": [
       "freeWheelAdserverVideo",
@@ -63,6 +65,7 @@
       "airgridRtdProvider",
       "akamaiDapRtdProvider",
       "arcspanRtdProvider",
+      "azerionedgeRtdProvider",
       "blueconicRtdProvider",
       "brandmetricsRtdProvider",
       "browsiRtdProvider",
@@ -102,6 +105,9 @@
     "videoModule": [
       "jwplayerVideoProvider",
       "videojsVideoProvider"
+    ],
+    "paapi": [
+      "fledgeForGpt"
     ]
   }
 }
