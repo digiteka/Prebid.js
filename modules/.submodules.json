@@ -39,6 +39,7 @@
       "teadsIdSystem",
       "tncIdSystem",
       "utiqSystem",
+      "utiqMtpIdSystem",
       "uid2IdSystem",
       "euidIdSystem",
       "unifiedIdSystem",
@@ -64,6 +65,7 @@
       "airgridRtdProvider",
       "akamaiDapRtdProvider",
       "arcspanRtdProvider",
+      "azerionedgeRtdProvider",
       "blueconicRtdProvider",
       "brandmetricsRtdProvider",
       "browsiRtdProvider",
@@ -103,6 +105,9 @@
     "videoModule": [
       "jwplayerVideoProvider",
       "videojsVideoProvider"
+    ],
+    "paapi": [
+      "fledgeForGpt"
     ]
   }
 }
