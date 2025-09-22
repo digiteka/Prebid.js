@@ -42,8 +42,6 @@ const AD_MANAGER_EVENTS = [AD_LOADED, AD_STARTED, AD_IMPRESSION, AD_PLAY, AD_PAU
 export function DigitekaProvider(providerConfig, vjs_, adState_, timeState_, callbackStorage_, utils) {
   console.log("digitekaProvider", providerConfig, vjs_, adState_, timeState_, callbackStorage_, utils);
   let vjs = vjs_;
-  // Supplied callbacks are typically wrapped by handlers
-  // we use this dict to keep track of these pairings
   const callbackToHandler = {};
 
   const adState = adState_;
@@ -51,7 +49,7 @@ export function DigitekaProvider(providerConfig, vjs_, adState_, timeState_, cal
   let player = null;
   let playerVersion = null;
   let playerIsSetup = false;
-  const {playerConfig, divId} = providerConfig;
+  const { playerConfig, divId } = providerConfig;
   let isMuted;
   let previousLastTimePosition = 0;
   let lastTimePosition = 0;
@@ -64,6 +62,7 @@ export function DigitekaProvider(providerConfig, vjs_, adState_, timeState_, cal
   let minimumSupportedPlayerVersion = '7.17.0';
 
   function init() {
+    console.log('DigitekaProvider init');
     if (!vjs) {
       triggerSetupFailure(-1, setupFailMessage + ': Videojs not present')
       return;
@@ -142,7 +141,7 @@ export function DigitekaProvider(providerConfig, vjs_, adState_, timeState_, cal
       // sequence - TODO not yet supported
       maxextended: -1,
       boxingallowed: 1,
-      playbackmethod: [ playBackMethod ],
+      playbackmethod: [playBackMethod],
       playbackend: PLAYBACK_END.VIDEO_COMPLETION,
       // Per ortb 7.4 skip is omitted since neither the player nor ima plugin imposes a skip button, or a skipmin/max
     };
@@ -615,7 +614,7 @@ export const utils = {
     return params.adPluginConfig || {}; // TODO: add adPluginConfig to spec
   },
 
-  getPositionCode: function({left, top, width, height}) {
+  getPositionCode: function ({ left, top, width, height }) {
     const bottom = getWinDimensions().innerHeight - top - height;
     const right = getWinDimensions().innerWidth - left - width;
 
@@ -626,7 +625,7 @@ export const utils = {
     return bottom >= 0 ? AD_POSITION.ABOVE_THE_FOLD : AD_POSITION.BELOW_THE_FOLD;
   },
 
-  getVideojsEventName: function(eventName) {
+  getVideojsEventName: function (eventName) {
     switch (eventName) {
       case SETUP_COMPLETE:
         return 'ready';
@@ -702,7 +701,7 @@ export const utils = {
      */
   },
 
-  getMedia: function(player) {
+  getMedia: function (player) {
     const playlistItem = this.getCurrentPlaylistItem(player);
     if (playlistItem) {
       return playlistItem.sources[0];
@@ -711,11 +710,11 @@ export const utils = {
     return player.getMedia();
   },
 
-  getValidMediaUrl: function(mediaSrc, playerSrc, eventTargetSrc) {
+  getValidMediaUrl: function (mediaSrc, playerSrc, eventTargetSrc) {
     return this.getMediaUrl(mediaSrc) || this.getMediaUrl(playerSrc) || this.getMediaUrl(eventTargetSrc);
   },
 
-  getMediaUrl: function(source) {
+  getMediaUrl: function (source) {
     if (!source) {
       return;
     }
@@ -752,7 +751,7 @@ export const utils = {
     return playlist.currentIndex && playlist.currentIndex();
   },
 
-  getCurrentPlaylistItem: function(player) {
+  getCurrentPlaylistItem: function (player) {
     const playlist = player.playlist; // has playlist plugin
     if (!playlist) {
       return;
@@ -775,6 +774,7 @@ const digitekaSubmoduleFactory = function (config) {
   const callbackStorage = null;
   // videojs factory is stored to window by default
   const vjs = window.videojs;
+  window.addEventListener('message', (e) => console.log("message", e));
   return DigitekaProvider(config, vjs, adState, timeState, callbackStorage, utils);
 }
 
