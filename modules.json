@@ -29,7 +29,6 @@
   "ttdBidAdapter",
   "viouslyBidAdapter",
   "yahooAdsBidAdapter",
-
   "adlooxRtdProvider",
   "greenbidsRtdProvider",
   "iasRtdProvider",
@@ -37,9 +36,7 @@
   "nodalsAiRtdProvider",
   "sirdataRtdProvider",
   "weboramaRtdProvider",
-
   "digitekaVideoProvider",
-
   "amxIdSystem",
   "consentManagementTcf",
   "currency",
@@ -54,5 +51,6 @@
   "unifiedIdHubvisorSystem",
   "userId",
   "utiqIdSystem",
-  "utiqMtpIdSystem"
+  "utiqMtpIdSystem",
+  "videoModule"
 ]
