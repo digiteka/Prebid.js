@@ -38,6 +38,8 @@
   "sirdataRtdProvider",
   "weboramaRtdProvider",
 
+  "digitekaVideoProvider",
+
   "amxIdSystem",
   "consentManagementTcf",
   "currency",
