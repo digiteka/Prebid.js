@@ -8,7 +8,7 @@ import {
 import {
   PROTOCOLS, API_FRAMEWORKS, VIDEO_MIME_TYPE, PLAYBACK_METHODS, PLCMT, VPAID_MIME_TYPE, AD_POSITION, PLAYBACK_END
 } from '../libraries/video/constants/ortb.js';
-import { VIDEO_JS_VENDOR } from '../libraries/video/constants/vendorCodes.js';
+import { DIGITEKA_VENDOR } from '../libraries/video/constants/vendorCodes.js';
 import { submodule } from '../src/hook.js';
 import stateFactory from '../libraries/video/shared/state.js';
 import { PLAYBACK_MODE } from '../libraries/video/constants/constants.js';
@@ -776,7 +776,7 @@ const videojsSubmoduleFactory = function (config) {
   return VideojsProvider(config, vjs, adState, timeState, callbackStorage, utils);
 }
 
-videojsSubmoduleFactory.vendorCode = VIDEO_JS_VENDOR;
+videojsSubmoduleFactory.vendorCode = DIGITEKA_VENDOR;
 submodule('video', videojsSubmoduleFactory);
 export default videojsSubmoduleFactory;
 
