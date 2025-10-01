@@ -128,16 +128,6 @@ export function DigitekaProvider(
       basePayload,
       getEventPayload
     );
-
-    const videojsEventName = utils.getVideojsEventName(externalEventName);
-
-    if (AD_MANAGER_EVENTS.includes(externalEventName)) {
-      player.on("ads-manager", () =>
-        player.ima.addEventListener(videojsEventName, eventHandler)
-      );
-    } else {
-      player.on(videojsEventName, eventHandler);
-    }
   }
 
   function offEvent(event, callback) {
@@ -205,7 +195,6 @@ const digitekaSubmoduleFactory = function (config) {
   console.log("digitekaSubmoduleFactory", config);
   const adState = adStateFactory();
   const callbackStorage = null;
-  window.addEventListener("message", (e) => console.log("message", e));
   return DigitekaProvider(config, adState, callbackStorage, utils);
 };
 
