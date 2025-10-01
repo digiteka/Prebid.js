@@ -3,6 +3,7 @@ import {
   AD_COMPLETE,
   AD_CLICK,
   AD_STARTED,
+  SETUP_COMPLETE,
 } from "../libraries/video/constants/events.js";
 import {
   PROTOCOLS,
@@ -172,17 +173,14 @@ export function DigitekaProvider(
       type: SETUP_COMPLETE,
     };
 
+    window.addEventListener('bidWinner', (e) => {
+      console.log("Prebid coucou", e);
+    });
+
     setupCompleteCallbacks.forEach((callback) =>
       callback(SETUP_COMPLETE, payload)
     );
     setupCompleteCallbacks = [];
-
-    isMuted = player.muted();
-
-    setupFailedEventHandlers.forEach((eventHandler) =>
-      player.off("error", eventHandler)
-    );
-    setupFailedEventHandlers = [];
   }
 }
 
