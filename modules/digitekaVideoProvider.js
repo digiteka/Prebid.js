@@ -91,15 +91,13 @@ export function DigitekaProvider(
     return video;
   }
 
-  function getOrtbContent() {}
-  function setAdTagUrl() {}
-  function setAdXml() {}
+  function getOrtbContent() { }
+  function setAdTagUrl() { }
+  function setAdXml() { }
 
   function onEvent(type, callback, payload) {
     console.log("Digiteka onEvent", type, callback, payload);
-    player.ready(() => {
-      registerListeners(type, callback, payload);
-    });
+    registerListeners(type, callback, payload);
   }
 
   function registerListeners(externalEventName, callback, basePayload) {
@@ -154,7 +152,7 @@ export function DigitekaProvider(
     }
   }
 
-  function destroy() {}
+  function destroy() { }
 
   return {
     init,
