@@ -123,11 +123,6 @@ export function DigitekaProvider(
       // infos.duration =
     });
 
-    const payload = {
-      divId,
-      type: SETUP_COMPLETE
-    };
-
     callbackPrebid(SETUP_COMPLETE, payload);
   }
 }
