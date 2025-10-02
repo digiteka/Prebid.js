@@ -22,7 +22,8 @@ import { getEventHandler } from "../libraries/video/shared/eventHandler.js";
  * @typedef {import('../libraries/video/shared/state.js').State} State
  */
 
-const AD_MANAGER_EVENTS = [AD_STARTED, AD_IMPRESSION, AD_COMPLETE];
+const infos = {};
+let vast;
 
 export function DigitekaProvider(
   providerConfig,
@@ -40,9 +41,7 @@ export function DigitekaProvider(
   const callbackToHandler = {};
 
   const adState = adState_;
-  let player = null;
   const { divId } = providerConfig;
-  let setupCompleteCallbacks = [];
   let setupFailedEventHandlers = [];
 
   function init() {
@@ -54,44 +53,7 @@ export function DigitekaProvider(
     return divId;
   }
 
-  function getOrtbVideo() {
-    if (!player) {
-      return;
-    }
-
-    let playBackMethod = PLAYBACK_METHODS.CLICK_TO_PLAY;
-
-    const autoplay = player.autoplay();
-    const muted = player.muted() || autoplay === "muted";
-
-    if (autoplay) {
-      playBackMethod = muted
-        ? PLAYBACK_METHODS.AUTOPLAY_MUTED
-        : PLAYBACK_METHODS.AUTOPLAY;
-    }
-    const supportedMediaTypes = Object.values(VIDEO_MIME_TYPE).filter(
-      (type) => player.canPlayType(type) !== ""
-    );
-
-    supportedMediaTypes.push(VPAID_MIME_TYPE);
-
-    const video = {
-      mimes: supportedMediaTypes,
-      protocols: [PROTOCOLS.VAST_2_0],
-      api: [
-        API_FRAMEWORKS.VPAID_2_0, // TODO: needs a reference to the imaOptions used at setup to determine if vpaid can be used
-      ],
-      h: player.currentHeight(),
-      w: player.currentWidth(),
-      maxextended: -1,
-      boxingallowed: 1,
-      playbackmethod: [playBackMethod],
-      playbackend: PLAYBACK_END.VIDEO_COMPLETION,
-    };
-
-    return video;
-  }
-
+  function getOrtbVideo() { }
   function getOrtbContent() { }
   function setAdTagUrl() { }
   function setAdXml() { }
@@ -99,7 +61,6 @@ export function DigitekaProvider(
   function onEvent(type, callback, payload) {
     console.log("Digiteka onEvent", type, callback, payload);
   }
-
 
   function offEvent(event, callback) { }
 
@@ -125,14 +86,40 @@ export function DigitekaProvider(
 
     window.addEventListener('bidWinner', (e) => {
       console.log("Prebid coucou", e);
-      const vast = utils.parseVAST(e?.detail?.vast);
+      vast = utils.parseVAST(e?.detail?.vast);
+      const ad = vast?.ads[0];
       console.log('guigui', vast);
+
+      // infos.adTagUrl =
+      infos.offset = 'pre';
+      // infos.loadTime =
+      // infos.vastAdId =
+      infos.adDescription = ad.description;
+      // infos.adServer =
+      infos.adTitle = ad.adTitle;
+      // infos.advertiserId =
+      // infos.advertiserName =
+      // infos.dealId =
+      infos.linear = true;
+      infos.vastVersion = vast.version;
+      // infos.creativeUrl =
+      infos.adId = ad.adId;
+      // infos.universalAdId =
+      // infos.creativeId =
+      // infos.creativeType =
+      infos.redirectUrl = ad.clickThrough || null;
+      infos.adPlacementType = 1;
+      // infos.waterfallIndex =
+      // infos.waterfallCount =
+      // infos.adPodCount =
+      // infos.adPodIndex =
+      // infos.wrapperAdIds =
+
+      // infos.time =
+      // infos.duration =
     });
 
-    setupCompleteCallbacks.forEach((callback) =>
-      callback(SETUP_COMPLETE, payload)
-    );
-    setupCompleteCallbacks = [];
+    callback(SETUP_COMPLETE, payload)
   }
 }
 
