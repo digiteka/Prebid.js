@@ -24,6 +24,7 @@ import { getEventHandler } from "../libraries/video/shared/eventHandler.js";
 
 const infos = {};
 let vast;
+let callbackPrebid = null;
 
 export function DigitekaProvider(
   providerConfig,
@@ -60,6 +61,9 @@ export function DigitekaProvider(
 
   function onEvent(type, callback, payload) {
     console.log("Digiteka onEvent", type, callback, payload);
+    if (type === SETUP_COMPLETE) {
+      callbackPrebid = callback;
+    }
   }
 
   function offEvent(event, callback) { }
@@ -119,7 +123,12 @@ export function DigitekaProvider(
       // infos.duration =
     });
 
-    callback(SETUP_COMPLETE, payload)
+    const payload = {
+      divId,
+      type: SETUP_COMPLETE
+    };
+
+    callbackPrebid(SETUP_COMPLETE, payload);
   }
 }
 
