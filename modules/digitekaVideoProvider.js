@@ -98,50 +98,10 @@ export function DigitekaProvider(
 
   function onEvent(type, callback, payload) {
     console.log("Digiteka onEvent", type, callback, payload);
-    registerListeners(type, callback, payload);
   }
 
-  function registerListeners(externalEventName, callback, basePayload) {
-    let getEventPayload;
 
-    switch (externalEventName) {
-      case AD_STARTED:
-      case AD_IMPRESSION:
-      case AD_CLICK:
-        getEventPayload = () => Object.assign({}, adState.getState());
-        break;
-      case AD_COMPLETE:
-        getEventPayload = () => {
-          const currentState = adState.getState();
-          adState.clearState();
-          return currentState;
-        };
-        break;
-
-      default:
-        return;
-    }
-
-    const eventHandler = getEventHandler(
-      externalEventName,
-      callback,
-      basePayload,
-      getEventPayload
-    );
-  }
-
-  function offEvent(event, callback) {
-    const videojsEvent = utils.getVideojsEventName(event);
-    if (!callback) {
-      player.off(videojsEvent);
-      return;
-    }
-
-    const eventHandler = callbackToHandler[event]; // callbackStorage.getCallback(event, callback);
-    if (eventHandler) {
-      player.off(videojsEvent, eventHandler);
-    }
-  }
+  function offEvent(event, callback) { }
 
   function destroy() { }
 
@@ -165,6 +125,8 @@ export function DigitekaProvider(
 
     window.addEventListener('bidWinner', (e) => {
       console.log("Prebid coucou", e);
+      const vast = utils.parseVASTBrowser(e?.detail?.vast);
+      console.log('guigui', vast);
     });
 
     setupCompleteCallbacks.forEach((callback) =>
@@ -175,20 +137,76 @@ export function DigitekaProvider(
 }
 
 export const utils = {
-  getVideojsEventName: function (eventName) {
-    switch (eventName) {
-      case AD_STARTED:
-        return "start";
-      case AD_IMPRESSION:
-        return "impression";
-      case AD_CLICK:
-        return "click";
-      case AD_COMPLETE:
-        return "ended";
-      default:
-        return eventName;
+  parseVAST: function (vastStr) {
+    if (!vastStr) {
+      console.warn("Empty VAST string");
+      return;
     }
-  },
+
+    const doc = new DOMParser().parseFromString(vastStr, "text/xml");
+
+    // Petit helper pour lire le texte d’un nœud
+    const text = (root, sel) => {
+      const n = root.querySelector(sel);
+      return n ? (n.textContent || "").trim() : null;
+    };
+
+    const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
+      const inline = adEl.querySelector("InLine");
+      const linear = inline?.querySelector("Creatives > Creative > Linear");
+
+      // Durée & skip
+      const duration = linear ? text(linear, "Duration") : null;
+      const skipoffset = linear?.getAttribute("skipoffset") || null;
+
+      // Media files
+      const mediaFiles = linear
+        ? [...linear.querySelectorAll("MediaFiles > MediaFile")].map(m => ({
+          id: m.getAttribute("id") || null,
+          type: m.getAttribute("type") || null,
+          delivery: m.getAttribute("delivery") || null,
+          width: m.getAttribute("width") ? Number(m.getAttribute("width")) : null,
+          height: m.getAttribute("height") ? Number(m.getAttribute("height")) : null,
+          bitrate: m.getAttribute("bitrate") ? Number(m.getAttribute("bitrate")) : null,
+          url: (m.textContent || "").trim(),
+        }))
+        : [];
+
+      // Tracking events
+      const tracking = linear
+        ? [...linear.querySelectorAll("TrackingEvents > Tracking")].map(t => ({
+          event: t.getAttribute("event"),
+          offset: t.getAttribute("offset") || null,
+          url: (t.textContent || "").trim(),
+        }))
+        : [];
+
+      // Impressions & ClickThrough
+      const impressions = [...adEl.querySelectorAll("InLine > Impression")].map(i =>
+        (i.textContent || "").trim()
+      );
+
+      const clickThrough = text(adEl, "InLine > Creatives > Creative > Linear > VideoClicks > ClickThrough");
+
+      return {
+        adId: adEl.getAttribute("id") || null,
+        adSystem: text(adEl, "InLine > AdSystem"),
+        adTitle: text(adEl, "InLine > AdTitle"),
+        description: text(adEl, "InLine > Description"),
+        duration,
+        skipoffset,
+        impressions,
+        clickThrough,
+        mediaFiles,
+        tracking,
+      };
+    });
+
+    return {
+      version: doc.documentElement.getAttribute("version") || null,
+      ads,
+    };
+  }
 };
 
 const digitekaSubmoduleFactory = function (config) {
