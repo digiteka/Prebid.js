@@ -125,7 +125,7 @@ export function DigitekaProvider(
 
     window.addEventListener('bidWinner', (e) => {
       console.log("Prebid coucou", e);
-      const vast = utils.parseVASTBrowser(e?.detail?.vast);
+      const vast = utils.parseVAST(e?.detail?.vast);
       console.log('guigui', vast);
     });
 
