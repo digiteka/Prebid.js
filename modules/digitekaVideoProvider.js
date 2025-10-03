@@ -33,21 +33,14 @@ export function DigitekaProvider(
   callbackStorage_,
   utils
 ) {
-  console.log(
-    "digitekaProvider",
-    providerConfig,
-    adState_,
-    callbackStorage_,
-    utils
-  );
-  const callbackToHandler = {};
+  console.log("digitekaProvider", providerConfig, adState_);
 
+  const callbackToHandler = {};
   const adState = adState_;
   const { divId } = providerConfig;
   let setupFailedEventHandlers = [];
 
   function init() {
-    console.log("DigitekaProvider init");
     triggerSetupComplete();
   }
 
@@ -89,10 +82,10 @@ export function DigitekaProvider(
     };
 
     window.addEventListener('bidWinner', async (e) => {
-      console.log("Prebid coucou", e);
       vast = await utils.parseVAST(e?.detail?.vast);
       const ad = vast?.ads[0];
-      console.log('guigui', vast, ad);
+
+      console.log('Ad received', vast, ad);
 
       if (ad) {
         // infos.adTagUrl =
@@ -149,11 +142,16 @@ export const utils = {
 
     const vastTagURI = utils.text(doc.querySelector("VAST"), "VASTAdTagURI")
     if (vastTagURI) {
-      console.log('vastURI', vastTagURI);
+      // console.log('vastURI', vastTagURI);
       const vastXML = await fetch(vastTagURI);
-      const vastText = await vastXML.text();
-      console.log('vastText', vastText);
-      return await utils.parseVAST(vastText);
+      if (vastXML) {
+        const vastText = await vastXML.text();
+        if (vastText) {
+          // console.log('vastText', vastText);
+          return await utils.parseVAST(vastText);
+        }
+      }
+      return null;
     }
 
     const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
@@ -217,7 +215,7 @@ export const utils = {
 const digitekaSubmoduleFactory = function (config) {
   if (!createdFactory) {
     createdFactory = true;
-    console.log("digitekaSubmoduleFactory", config);
+
     const adState = adStateFactory();
     const callbackStorage = null;
     return DigitekaProvider(config, adState, callbackStorage, utils);
