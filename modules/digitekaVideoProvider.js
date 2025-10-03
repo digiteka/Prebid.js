@@ -151,8 +151,12 @@ export const utils = {
       console.log('vastURI', vastTagURI);
       const vastXML = await fetch(vastTagURI);
       const vastText = await vastXML.text();
+      console.log('vastText', vastTagURI);
       return await utils.parseVAST(vastText);
     }
+
+    console.log('vastResult', vastTagURI);
+
 
     const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
       const inline = adEl.querySelector("InLine");
