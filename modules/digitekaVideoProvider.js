@@ -144,7 +144,7 @@ export const utils = {
 
     const doc = new DOMParser().parseFromString(vastStr, "text/xml");
 
-    const vastTagURI = utils.text(doc.querySelector("VASTAdTagURI"), "InLine > AdSystem")
+    const vastTagURI = utils.text(doc.querySelector("VAST"), "VASTAdTagURI")
     console.log('vastURI', vastTagURI);
     return;
 
