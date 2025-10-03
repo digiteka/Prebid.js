@@ -87,9 +87,9 @@ export function DigitekaProvider(
       type: SETUP_COMPLETE,
     };
 
-    window.addEventListener('bidWinner', (e) => {
+    window.addEventListener('bidWinner', async (e) => {
       console.log("Prebid coucou", e);
-      vast = utils.parseVAST(e?.detail?.vast);
+      vast = await utils.parseVAST(e?.detail?.vast);
       const ad = vast?.ads[0];
       console.log('guigui', vast);
 
@@ -136,7 +136,7 @@ export const utils = {
     const n = root.querySelector(sel);
     return n ? (n.textContent || "").trim() : null;
   },
-  parseVAST: function (vastStr) {
+  parseVAST: async function (vastStr) {
     if (!vastStr) {
       console.warn("Empty VAST string");
       return;
@@ -145,9 +145,10 @@ export const utils = {
     const doc = new DOMParser().parseFromString(vastStr, "text/xml");
 
     const vastTagURI = utils.text(doc.querySelector("VAST"), "VASTAdTagURI")
-    console.log('vastURI', vastTagURI);
-    return;
-
+    if (vastTagURI) {
+      console.log('vastURI', vastTagURI);
+      return await fetch(vastTagURI).then(el => utils.parseVAST(el));
+    }
 
     const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
       const inline = adEl.querySelector("InLine");
@@ -233,6 +234,7 @@ export function adStateFactory() {
 
     const skippable = event.skippable;
     const updates = {
+      /*
       adId: event.adId,
       adServer: event.adSystem,
       advertiserName: event.advertiserName,
@@ -246,7 +248,7 @@ export function adStateFactory() {
       universalAdId: event.universalAdIdValue,
       creativeType: event.contentType,
       wrapperAdIds: event.adWrapperIds,
-      skip: skippable ? 1 : 0,
+      skip: skippable ? 1 : 0,*/
     };
 
     const adPodInfo = event.adPodInfo;
