@@ -91,35 +91,37 @@ export function DigitekaProvider(
       console.log("Prebid coucou", e);
       vast = await utils.parseVAST(e?.detail?.vast);
       const ad = vast?.ads[0];
-      console.log('guigui', vast);
+      console.log('guigui', vast, ad);
 
-      // infos.adTagUrl =
-      infos.offset = 'pre';
-      // infos.loadTime =
-      // infos.vastAdId =
-      infos.adDescription = ad.description;
-      // infos.adServer =
-      infos.adTitle = ad.adTitle;
-      // infos.advertiserId =
-      // infos.advertiserName =
-      // infos.dealId =
-      infos.linear = true;
-      infos.vastVersion = vast.version;
-      // infos.creativeUrl =
-      infos.adId = ad.adId;
-      // infos.universalAdId =
-      // infos.creativeId =
-      // infos.creativeType =
-      infos.redirectUrl = ad.clickThrough || null;
-      infos.adPlacementType = 1;
-      // infos.waterfallIndex =
-      // infos.waterfallCount =
-      // infos.adPodCount =
-      // infos.adPodIndex =
-      // infos.wrapperAdIds =
+      if (ad) {
+        // infos.adTagUrl =
+        infos.offset = 'pre';
+        // infos.loadTime =
+        // infos.vastAdId =
+        infos.adDescription = ad.description;
+        // infos.adServer =
+        infos.adTitle = ad.adTitle;
+        // infos.advertiserId =
+        // infos.advertiserName =
+        // infos.dealId =
+        infos.linear = true;
+        infos.vastVersion = vast.version;
+        // infos.creativeUrl =
+        infos.adId = ad.adId;
+        // infos.universalAdId =
+        // infos.creativeId =
+        // infos.creativeType =
+        infos.redirectUrl = ad.clickThrough || null;
+        infos.adPlacementType = 1;
+        // infos.waterfallIndex =
+        // infos.waterfallCount =
+        // infos.adPodCount =
+        // infos.adPodIndex =
+        // infos.wrapperAdIds =
 
-      // infos.time =
-      // infos.duration =
+        // infos.time =
+        // infos.duration =
+      }
     });
 
     callbackPrebid(SETUP_COMPLETE, payload);
@@ -147,7 +149,9 @@ export const utils = {
     const vastTagURI = utils.text(doc.querySelector("VAST"), "VASTAdTagURI")
     if (vastTagURI) {
       console.log('vastURI', vastTagURI);
-      return await fetch(vastTagURI).then(el => utils.parseVAST(el));
+      const vastXML = await fetch(vastTagURI);
+      const vastText = await vastXML.text();
+      return await utils.parseVAST(vastText);
     }
 
     const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
