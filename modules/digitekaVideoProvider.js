@@ -151,7 +151,7 @@ export const utils = {
       console.log('vastURI', vastTagURI);
       const vastXML = await fetch(vastTagURI);
       const vastText = await vastXML.text();
-      console.log('vastText', vastTagURI);
+      console.log('vastText', vastText);
       return await utils.parseVAST(vastText);
     }
 
