@@ -25,6 +25,7 @@ import { getEventHandler } from "../libraries/video/shared/eventHandler.js";
 const infos = {};
 let vast;
 let callbackPrebid = null;
+let createdFactory = false;
 
 export function DigitekaProvider(
   providerConfig,
@@ -155,9 +156,6 @@ export const utils = {
       return await utils.parseVAST(vastText);
     }
 
-    console.log('vastResult', vastTagURI);
-
-
     const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
       const inline = adEl.querySelector("InLine");
       const linear = inline?.querySelector("Creatives > Creative > Linear");
@@ -217,10 +215,13 @@ export const utils = {
 };
 
 const digitekaSubmoduleFactory = function (config) {
-  console.log("digitekaSubmoduleFactory", config);
-  const adState = adStateFactory();
-  const callbackStorage = null;
-  return DigitekaProvider(config, adState, callbackStorage, utils);
+  if (!createdFactory) {
+    createdFactory = true;
+    console.log("digitekaSubmoduleFactory", config);
+    const adState = adStateFactory();
+    const callbackStorage = null;
+    return DigitekaProvider(config, adState, callbackStorage, utils);
+  }
 };
 
 digitekaSubmoduleFactory.vendorCode = DIGITEKA_VENDOR;
