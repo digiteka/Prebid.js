@@ -60,7 +60,6 @@ export function DigitekaProvider(
   function setAdXml() { }
 
   function onEvent(type, callback, payload) {
-    console.log("Digiteka onEvent", type, callback, payload);
     if (type === SETUP_COMPLETE) {
       callbackPrebid = callback;
     }
@@ -136,8 +135,16 @@ export const utils = {
 
     const doc = new DOMParser().parseFromString(vastStr, "text/xml");
 
+    const vastTagURI = text(doc.querySelector("VASTAdTagURI"), "InLine > AdSystem")
+    console.log('vastURI', vastTagURI);
+    return;
+
     // Petit helper pour lire le texte d’un nœud
     const text = (root, sel) => {
+      if(!root){
+        return null;
+      }
+
       const n = root.querySelector(sel);
       return n ? (n.textContent || "").trim() : null;
     };
