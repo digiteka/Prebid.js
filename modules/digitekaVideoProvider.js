@@ -127,6 +127,15 @@ export function DigitekaProvider(
 }
 
 export const utils = {
+  // Petit helper pour lire le texte d’un nœud
+  text: function (root, sel) {
+    if (!root) {
+      return null;
+    }
+
+    const n = root.querySelector(sel);
+    return n ? (n.textContent || "").trim() : null;
+  },
   parseVAST: function (vastStr) {
     if (!vastStr) {
       console.warn("Empty VAST string");
@@ -135,26 +144,17 @@ export const utils = {
 
     const doc = new DOMParser().parseFromString(vastStr, "text/xml");
 
-    const vastTagURI = text(doc.querySelector("VASTAdTagURI"), "InLine > AdSystem")
+    const vastTagURI = utils.text(doc.querySelector("VASTAdTagURI"), "InLine > AdSystem")
     console.log('vastURI', vastTagURI);
     return;
 
-    // Petit helper pour lire le texte d’un nœud
-    const text = (root, sel) => {
-      if(!root){
-        return null;
-      }
-
-      const n = root.querySelector(sel);
-      return n ? (n.textContent || "").trim() : null;
-    };
 
     const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
       const inline = adEl.querySelector("InLine");
       const linear = inline?.querySelector("Creatives > Creative > Linear");
 
       // Durée & skip
-      const duration = linear ? text(linear, "Duration") : null;
+      const duration = linear ? utils.text(linear, "Duration") : null;
       const skipoffset = linear?.getAttribute("skipoffset") || null;
 
       // Media files
@@ -184,13 +184,13 @@ export const utils = {
         (i.textContent || "").trim()
       );
 
-      const clickThrough = text(adEl, "InLine > Creatives > Creative > Linear > VideoClicks > ClickThrough");
+      const clickThrough = utils.text(adEl, "InLine > Creatives > Creative > Linear > VideoClicks > ClickThrough");
 
       return {
         adId: adEl.getAttribute("id") || null,
-        adSystem: text(adEl, "InLine > AdSystem"),
-        adTitle: text(adEl, "InLine > AdTitle"),
-        description: text(adEl, "InLine > Description"),
+        adSystem: utils.text(adEl, "InLine > AdSystem"),
+        adTitle: utils.text(adEl, "InLine > AdTitle"),
+        description: utils.text(adEl, "InLine > Description"),
         duration,
         skipoffset,
         impressions,
