@@ -85,10 +85,8 @@ export function DigitekaProvider(
 
       window.dtkIma.addEventListener(google.ima.AdEvent.Type.STARTED, console.log('ok started'));
       window.dtkIma.addEventListener(google.ima.AdEvent.Type.IMPRESSION, console.log('ok impression'));
-      window.dtkIma.addEventListener(google.ima.AdEvent.Type.FIRST_QUARTILE, console.log('ok started'));
-      window.dtkIma.addEventListener(google.ima.AdEvent.Type.MIDPOINT, console.log('ok started'));
-      window.dtkIma.addEventListener(google.ima.AdEvent.Type.THIRD_QUARTILE, console.log('ok started'));
-      window.dtkIma.addEventListener(google.ima.AdEvent.Type.COMPLETE, console.log('ok started'));
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.FIRST_QUARTILE, console.log('ok quart'));
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.COMPLETE, console.log('ok complete'));
     });
 
     callbackPrebid(SETUP_COMPLETE, payload);
