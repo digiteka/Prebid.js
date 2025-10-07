@@ -81,7 +81,14 @@ export function DigitekaProvider(
     };
 
     window.addEventListener('dtkPlayerReady', async (e) => {
-      console.log(window, window.dtkIma);
+      console.log(window.dtkIma, window.google.ima.AdEvent.Type);
+
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.STARTED, console.log('ok started'));
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.IMPRESSION, console.log('ok impression'));
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.FIRST_QUARTILE, console.log('ok started'));
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.MIDPOINT, console.log('ok started'));
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.THIRD_QUARTILE, console.log('ok started'));
+      window.dtkIma.addEventListener(google.ima.AdEvent.Type.COMPLETE, console.log('ok started'));
     });
 
     callbackPrebid(SETUP_COMPLETE, payload);
@@ -106,11 +113,6 @@ const digitekaSubmoduleFactory = function (config) {
 
     const adState = adStateFactory();
     const callbackStorage = null;
-
-    console.log('guigui player 0', window, window.dtkplayer, window.dtkplayer?.ima);
-    setTimeout(() => {
-      console.log('guigui player 1', window.dtkplayer, window.dtkplayer?.ima);
-    }, 5000);
     return DigitekaProvider(config, adState, callbackStorage, utils);
   }
 };
