@@ -218,7 +218,7 @@ const digitekaSubmoduleFactory = function (config) {
     const adState = adStateFactory();
     const callbackStorage = null;
 
-    console.log('guigui player 0', window.dtkplayer, window.dtkplayer?.ima);
+    console.log('guigui player 0', window, window.dtkplayer, window.dtkplayer?.ima);
     setTimeout(() => {
       console.log('guigui player 1', window.dtkplayer, window.dtkplayer?.ima);
     }, 5000);
