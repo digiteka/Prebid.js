@@ -33,7 +33,6 @@ export function DigitekaProvider(
   callbackStorage_,
   utils
 ) {
-  console.log("digitekaProvider", providerConfig, adState_);
 
   const callbackToHandler = {};
   const adState = adState_;
@@ -42,6 +41,7 @@ export function DigitekaProvider(
 
   function init() {
     triggerSetupComplete();
+    console.log('guigui player 0', window.dtkplayer, window.dtkplayer.ima);
   }
 
   function getId() {
@@ -84,6 +84,8 @@ export function DigitekaProvider(
     window.addEventListener('bidWinner', async (e) => {
       vast = await utils.parseVAST(e?.detail?.vast);
       const ad = vast?.ads[0];
+
+      console.log('guigui player', window.dtkplayer, window.dtkplayer.ima);
 
       console.log('Ad received', vast, ad);
 
