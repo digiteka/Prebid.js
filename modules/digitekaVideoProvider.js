@@ -80,41 +80,8 @@ export function DigitekaProvider(
       type: SETUP_COMPLETE,
     };
 
-    window.addEventListener('bidWinner', async (e) => {
-      vast = await utils.parseVAST(e?.detail?.vast);
-      const ad = vast?.ads[0];
-
-      console.log('Ad received', vast, ad);
-
-      if (ad) {
-        // infos.adTagUrl =
-        infos.offset = 'pre';
-        // infos.loadTime =
-        // infos.vastAdId =
-        infos.adDescription = ad.description;
-        // infos.adServer =
-        infos.adTitle = ad.adTitle;
-        // infos.advertiserId =
-        // infos.advertiserName =
-        // infos.dealId =
-        infos.linear = true;
-        infos.vastVersion = vast.version;
-        // infos.creativeUrl =
-        infos.adId = ad.adId;
-        // infos.universalAdId =
-        // infos.creativeId =
-        // infos.creativeType =
-        infos.redirectUrl = ad.clickThrough || null;
-        infos.adPlacementType = 1;
-        // infos.waterfallIndex =
-        // infos.waterfallCount =
-        // infos.adPodCount =
-        // infos.adPodIndex =
-        // infos.wrapperAdIds =
-
-        // infos.time =
-        // infos.duration =
-      }
+    window.addEventListener('dtkPlayerReady', async (e) => {
+      console.log(window, window.dtkIma);
     });
 
     callbackPrebid(SETUP_COMPLETE, payload);
@@ -130,84 +97,6 @@ export const utils = {
 
     const n = root.querySelector(sel);
     return n ? (n.textContent || "").trim() : null;
-  },
-  parseVAST: async function (vastStr) {
-    if (!vastStr) {
-      console.warn("Empty VAST string");
-      return;
-    }
-
-    const doc = new DOMParser().parseFromString(vastStr, "text/xml");
-
-    const vastTagURI = utils.text(doc.querySelector("VAST"), "VASTAdTagURI")
-    if (vastTagURI) {
-      // console.log('vastURI', vastTagURI);
-      const vastXML = await fetch(vastTagURI);
-      if (vastXML) {
-        const vastText = await vastXML.text();
-        if (vastText) {
-          // console.log('vastText', vastText);
-          return await utils.parseVAST(vastText);
-        }
-      }
-      return null;
-    }
-
-    const ads = [...doc.querySelectorAll("VAST > Ad")].map(adEl => {
-      const inline = adEl.querySelector("InLine");
-      const linear = inline?.querySelector("Creatives > Creative > Linear");
-
-      // Durée & skip
-      const duration = linear ? utils.text(linear, "Duration") : null;
-      const skipoffset = linear?.getAttribute("skipoffset") || null;
-
-      // Media files
-      const mediaFiles = linear
-        ? [...linear.querySelectorAll("MediaFiles > MediaFile")].map(m => ({
-          id: m.getAttribute("id") || null,
-          type: m.getAttribute("type") || null,
-          delivery: m.getAttribute("delivery") || null,
-          width: m.getAttribute("width") ? Number(m.getAttribute("width")) : null,
-          height: m.getAttribute("height") ? Number(m.getAttribute("height")) : null,
-          bitrate: m.getAttribute("bitrate") ? Number(m.getAttribute("bitrate")) : null,
-          url: (m.textContent || "").trim(),
-        }))
-        : [];
-
-      // Tracking events
-      const tracking = linear
-        ? [...linear.querySelectorAll("TrackingEvents > Tracking")].map(t => ({
-          event: t.getAttribute("event"),
-          offset: t.getAttribute("offset") || null,
-          url: (t.textContent || "").trim(),
-        }))
-        : [];
-
-      // Impressions & ClickThrough
-      const impressions = [...adEl.querySelectorAll("InLine > Impression")].map(i =>
-        (i.textContent || "").trim()
-      );
-
-      const clickThrough = utils.text(adEl, "InLine > Creatives > Creative > Linear > VideoClicks > ClickThrough");
-
-      return {
-        adId: adEl.getAttribute("id") || null,
-        adSystem: utils.text(adEl, "InLine > AdSystem"),
-        adTitle: utils.text(adEl, "InLine > AdTitle"),
-        description: utils.text(adEl, "InLine > Description"),
-        duration,
-        skipoffset,
-        impressions,
-        clickThrough,
-        mediaFiles,
-        tracking,
-      };
-    });
-
-    return {
-      version: doc.documentElement.getAttribute("version") || null,
-      ads,
-    };
   }
 };
 
