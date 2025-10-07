@@ -41,7 +41,6 @@ export function DigitekaProvider(
 
   function init() {
     triggerSetupComplete();
-    console.log('guigui player 0', window.dtkplayer, window.dtkplayer.ima);
   }
 
   function getId() {
@@ -84,8 +83,6 @@ export function DigitekaProvider(
     window.addEventListener('bidWinner', async (e) => {
       vast = await utils.parseVAST(e?.detail?.vast);
       const ad = vast?.ads[0];
-
-      console.log('guigui player', window.dtkplayer, window.dtkplayer.ima);
 
       console.log('Ad received', vast, ad);
 
@@ -220,6 +217,11 @@ const digitekaSubmoduleFactory = function (config) {
 
     const adState = adStateFactory();
     const callbackStorage = null;
+
+    console.log('guigui player 0', window.dtkplayer, window.dtkplayer?.ima);
+    setTimeout(() => {
+      console.log('guigui player 1', window.dtkplayer, window.dtkplayer?.ima);
+    }, 5000);
     return DigitekaProvider(config, adState, callbackStorage, utils);
   }
 };
