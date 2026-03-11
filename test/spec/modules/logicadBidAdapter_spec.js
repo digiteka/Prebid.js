@@ -1,5 +1,5 @@
-import {expect} from 'chai';
-import {spec} from '../../../modules/logicadBidAdapter.js';
+import { expect } from 'chai';
+import { spec } from '../../../modules/logicadBidAdapter.js';
 import * as utils from 'src/utils.js';
 
 describe('LogicadAdapter', function () {
@@ -84,19 +84,23 @@ describe('LogicadAdapter', function () {
             name: 'cd.ladsp.com'
           }
         ]
+      },
+      source: {
+        ext: {
+          schain: {
+            ver: '1.0',
+            complete: 1,
+            nodes: [
+              {
+                asi: 'exchange1.com',
+                sid: '1234',
+                hp: 1
+              }
+            ]
+          }
+        }
       }
     },
-    schain: {
-      ver: '1.0',
-      complete: 1,
-      nodes: [
-        {
-          asi: 'exchange1.com',
-          sid: '1234',
-          hp: 1
-        }
-      ]
-    }
   }];
   const nativeBidRequests = [{
     bidder: 'logicad',
@@ -249,12 +253,12 @@ describe('LogicadAdapter', function () {
             seller: 'https://fledge.ladsp.com',
             decisionLogicUrl: 'https://fledge.ladsp.com/decision_logic.js',
             interestGroupBuyers: ['https://fledge.ladsp.com'],
-            requestedSize: {width: '300', height: '250'},
-            allSlotsRequestedSizes: [{width: '300', height: '250'}],
-            sellerSignals: {signal: 'signal'},
+            requestedSize: { width: '300', height: '250' },
+            allSlotsRequestedSizes: [{ width: '300', height: '250' }],
+            sellerSignals: { signal: 'signal' },
             sellerTimeout: '500',
-            perBuyerSignals: {'https://fledge.ladsp.com': {signal: 'signal'}},
-            perBuyerCurrencies: {'https://fledge.ladsp.com': 'USD'}
+            perBuyerSignals: { 'https://fledge.ladsp.com': { signal: 'signal' } },
+            perBuyerCurrencies: { 'https://fledge.ladsp.com': 'USD' }
           }
         }]
       },
@@ -309,13 +313,13 @@ describe('LogicadAdapter', function () {
     });
 
     it('should return false if the tid parameter is not present', function () {
-      let bidRequest = utils.deepClone(bidRequests[0]);
+      const bidRequest = utils.deepClone(bidRequests[0]);
       delete bidRequest.params.tid;
       expect(spec.isBidRequestValid(bidRequest)).to.be.false;
     });
 
     it('should return false if the params object is not present', function () {
-      let bidRequest = utils.deepClone(bidRequests);
+      const bidRequest = utils.deepClone(bidRequests);
       delete bidRequest[0].params;
       expect(spec.isBidRequestValid(bidRequest)).to.be.false;
     });
@@ -436,10 +440,10 @@ describe('LogicadAdapter', function () {
 
   describe('getUserSyncs', function () {
     it('should perform usersync', function () {
-      let syncs = spec.getUserSyncs({pixelEnabled: false}, [serverResponse]);
+      let syncs = spec.getUserSyncs({ pixelEnabled: false }, [serverResponse]);
       expect(syncs).to.have.length(0);
 
-      syncs = spec.getUserSyncs({pixelEnabled: true}, [serverResponse]);
+      syncs = spec.getUserSyncs({ pixelEnabled: true }, [serverResponse]);
       expect(syncs).to.have.length(1);
 
       expect(syncs[0]).to.have.property('type', 'image');

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { spec } from 'modules/optoutBidAdapter.js';
-import {config} from 'src/config.js';
+import { config } from 'src/config.js';
 
 describe('optoutAdapterTest', function () {
   describe('bidRequestValidity', function () {
@@ -94,7 +94,7 @@ describe('optoutAdapterTest', function () {
     it('bidRequest with config for currency', function () {
       config.setConfig({
         currency: {
-       	    adServerCurrency: 'USD',
+          adServerCurrency: 'USD',
           granularityMultiplier: 1
         }
       })

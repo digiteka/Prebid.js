@@ -10,18 +10,19 @@ import {
   deepClone,
   deepSetValue, getWindowTop
 } from '../src/utils.js';
-import {registerBidder} from '../src/adapters/bidderFactory.js';
-import {config} from '../src/config.js';
-import {BANNER, NATIVE, VIDEO} from '../src/mediaTypes.js';
-import {Renderer} from '../src/Renderer.js';
+import { registerBidder } from '../src/adapters/bidderFactory.js';
+import { config } from '../src/config.js';
+import { BANNER, NATIVE, VIDEO } from '../src/mediaTypes.js';
+import { Renderer } from '../src/Renderer.js';
 import { convertOrtbRequestToProprietaryNative } from '../src/native.js';
-import {getGptSlotInfoForAdUnitCode} from '../libraries/gptUtils/gptUtils.js';
-import {getViewportCoordinates} from '../libraries/viewport/viewport.js';
-import {filterBidsListByFilters, getTopWindowReferrer} from '../libraries/medianetUtils/utils.js';
-import {errorLogger} from '../libraries/medianetUtils/logger.js';
-import {GLOBAL_VENDOR_ID, MEDIANET} from '../libraries/medianetUtils/constants.js';
-import {getGlobal} from '../src/prebidGlobal.js';
-import {getBoundingClientRect} from '../libraries/boundingClientRect/boundingClientRect.js';
+import { getGptSlotInfoForAdUnitCode } from '../libraries/gptUtils/gptUtils.js';
+import { getViewportCoordinates } from '../libraries/viewport/viewport.js';
+import { filterBidsListByFilters, getTopWindowReferrer } from '../libraries/medianetUtils/utils.js';
+import { errorLogger } from '../libraries/medianetUtils/logger.js';
+import { GLOBAL_VENDOR_ID, MEDIANET } from '../libraries/medianetUtils/constants.js';
+import { getGlobal } from '../src/prebidGlobal.js';
+import { getBoundingClientRect } from '../libraries/boundingClientRect/boundingClientRect.js';
+import { getMinSize } from '../libraries/sizeUtils/sizeUtils.js';
 
 /**
  * @typedef {import('../src/adapters/bidderFactory.js').BidRequest} BidRequest
@@ -62,7 +63,7 @@ getGlobal().medianetGlobals = getGlobal().medianetGlobals || {};
 function siteDetails(site, bidderRequest) {
   const urlData = bidderRequest.refererInfo;
   site = site || {};
-  let siteData = {
+  const siteData = {
     domain: site.domain || urlData.domain,
     page: site.page || urlData.page,
     ref: getTopWindowReferrer(site.ref),
@@ -79,7 +80,7 @@ function getPageMeta() {
   if (pageMeta) {
     return pageMeta;
   }
-  let canonicalUrl = getUrlFromSelector('link[rel="canonical"]', 'href');
+  const canonicalUrl = getUrlFromSelector('link[rel="canonical"]', 'href');
 
   pageMeta = Object.assign({},
     canonicalUrl && { 'canonical_url': canonicalUrl },
@@ -89,14 +90,14 @@ function getPageMeta() {
 }
 
 function getUrlFromSelector(selector, attribute) {
-  let attr = getAttributeFromSelector(selector, attribute);
+  const attr = getAttributeFromSelector(selector, attribute);
   return attr && getAbsoluteUrl(attr);
 }
 
 function getAttributeFromSelector(selector, attribute) {
   try {
-    let doc = getWindowTop().document;
-    let element = doc.querySelector(selector);
+    const doc = getWindowTop().document;
+    const element = doc.querySelector(selector);
     if (element !== null && element[attribute]) {
       return element[attribute];
     }
@@ -104,7 +105,7 @@ function getAttributeFromSelector(selector, attribute) {
 }
 
 function getAbsoluteUrl(url) {
-  let aTag = getWindowTop().document.createElement('a');
+  const aTag = getWindowTop().document.createElement('a');
   aTag.href = url;
 
   return aTag.href;
@@ -136,14 +137,14 @@ function getCoordinates(adUnitCode) {
   let element = document.getElementById(adUnitCode);
   if (!element && adUnitCode.indexOf('/') !== -1) {
     // now it means that adUnitCode is GAM AdUnitPath
-    const {divId} = getGptSlotInfoForAdUnitCode(adUnitCode);
+    const { divId } = getGptSlotInfoForAdUnitCode(adUnitCode);
     if (isStr(divId)) {
       element = document.getElementById(divId);
     }
   }
   if (element) {
     const rect = getBoundingClientRect(element);
-    let coordinates = {};
+    const coordinates = {};
     coordinates.top_left = {
       y: rect.top,
       x: rect.left
@@ -162,12 +163,12 @@ function extParams(bidRequest, bidderRequests) {
   const gdpr = deepAccess(bidderRequests, 'gdprConsent');
   const uspConsent = deepAccess(bidderRequests, 'uspConsent');
   const userId = deepAccess(bidRequest, 'userId');
-  const sChain = deepAccess(bidRequest, 'schain') || {};
+  const sChain = deepAccess(bidRequest, 'ortb2.source.ext.schain') || {};
   const windowSize = spec.getWindowSize();
   const gdprApplies = !!(gdpr && gdpr.gdprApplies);
   const uspApplies = !!(uspConsent);
   const coppaApplies = !!(config.getConfig('coppa'));
-  const {top = -1, right = -1, bottom = -1, left = -1} = getViewportCoordinates();
+  const { top = -1, right = -1, bottom = -1, left = -1 } = getViewportCoordinates();
   return Object.assign({},
     { customer_id: params.cid },
     { prebid_version: 'v' + '$prebid.version$' },
@@ -175,11 +176,11 @@ function extParams(bidRequest, bidderRequests) {
     (gdprApplies) && { gdpr_consent_string: gdpr.consentString || '' },
     { usp_applies: uspApplies },
     uspApplies && { usp_consent_string: uspConsent || '' },
-    {coppa_applies: coppaApplies},
+    { coppa_applies: coppaApplies },
     windowSize.w !== -1 && windowSize.h !== -1 && { screen: windowSize },
     userId && { user_id: userId },
     getGlobal().medianetGlobals.analyticsEnabled && { analytics: true },
-    !isEmpty(sChain) && {schain: sChain},
+    !isEmpty(sChain) && { schain: sChain },
     {
       vcoords: {
         top_left: { x: left, y: top },
@@ -191,12 +192,16 @@ function extParams(bidRequest, bidderRequests) {
 
 function slotParams(bidRequest, bidderRequests) {
   // check with Media.net Account manager for  bid floor and crid parameters
-  let params = {
+  const slotInfo = getGptSlotInfoForAdUnitCode(bidRequest.adUnitCode);
+  const params = {
     id: bidRequest.bidId,
     transactionId: bidRequest.ortb2Imp?.ext?.tid,
     ext: {
       dfp_id: bidRequest.adUnitCode,
-      display_count: bidRequest.auctionsCount
+      display_count: bidRequest.auctionsCount,
+      adUnitCode: bidRequest.adUnitCode,
+      divId: slotInfo.divId,
+      adUnitPath: slotInfo.gptSlot
     },
     all: bidRequest.params
   };
@@ -205,7 +210,7 @@ function slotParams(bidRequest, bidderRequests) {
     params.ortb2Imp = bidRequest.ortb2Imp;
   }
 
-  let bannerSizes = deepAccess(bidRequest, 'mediaTypes.banner.sizes') || [];
+  const bannerSizes = deepAccess(bidRequest, 'mediaTypes.banner.sizes') || [];
 
   const videoInMediaType = deepAccess(bidRequest, 'mediaTypes.video') || {};
   const videoInParams = deepAccess(bidRequest, 'params.video') || {};
@@ -230,13 +235,13 @@ function slotParams(bidRequest, bidderRequests) {
     params.tagid = bidRequest.params.crid.toString();
   }
 
-  let bidFloor = parseFloat(bidRequest.params.bidfloor || bidRequest.params.bidFloor);
+  const bidFloor = parseFloat(bidRequest.params.bidfloor || bidRequest.params.bidFloor);
   if (bidFloor) {
     params.bidfloor = bidFloor;
   }
   const coordinates = getCoordinates(bidRequest.adUnitCode);
   if (coordinates && params.banner && params.banner.length !== 0) {
-    let normCoordinates = normalizeCoordinates(coordinates);
+    const normCoordinates = normalizeCoordinates(coordinates);
     params.ext.coordinates = normCoordinates;
     params.ext.viewability = getSlotVisibility(coordinates.top_left, getMinSize(params.banner));
     if (getSlotVisibility(normCoordinates.top_left, getMinSize(params.banner)) > 0.5) {
@@ -258,7 +263,7 @@ function slotParams(bidRequest, bidderRequests) {
 }
 
 function getBidFloorByType(bidRequest) {
-  let floorInfo = [];
+  const floorInfo = [];
   if (typeof bidRequest.getFloor === 'function') {
     [BANNER, VIDEO, NATIVE].forEach(mediaType => {
       if (bidRequest.mediaTypes.hasOwnProperty(mediaType)) {
@@ -277,19 +282,16 @@ function getBidFloorByType(bidRequest) {
   return floorInfo;
 }
 function setFloorInfo(bidRequest, mediaType, size, floorInfo) {
-  let floor = bidRequest.getFloor({currency: 'USD', mediaType: mediaType, size: size}) || {};
+  const floor = bidRequest.getFloor({ currency: 'USD', mediaType: mediaType, size: size }) || {};
   if (size.length > 1) floor.size = size;
   floor.mediaType = mediaType;
   floorInfo.push(floor);
 }
-function getMinSize(sizes) {
-  return sizes.reduce((min, size) => size.h * size.w < min.h * min.w ? size : min);
-}
 
 function getSlotVisibility(topLeft, size) {
-  let maxArea = size.w * size.h;
-  let windowSize = spec.getWindowSize();
-  let bottomRight = {
+  const maxArea = size.w * size.h;
+  const windowSize = spec.getWindowSize();
+  const bottomRight = {
     x: topLeft.x + size.w,
     y: topLeft.y + size.h
   };
@@ -297,7 +299,7 @@ function getSlotVisibility(topLeft, size) {
     return 0;
   }
 
-  return getOverlapArea(topLeft, bottomRight, {x: 0, y: 0}, {x: windowSize.w, y: windowSize.h}) / maxArea;
+  return getOverlapArea(topLeft, bottomRight, { x: 0, y: 0 }, { x: windowSize.w, y: windowSize.h }) / maxArea;
 }
 
 // find the overlapping area between two rectangles
@@ -311,7 +313,7 @@ function getOverlapArea(topLeft1, bottomRight1, topLeft2, bottomRight2) {
 }
 
 function normalizeCoordinates(coordinates) {
-  const {scrollX, scrollY} = window;
+  const { scrollX, scrollY } = window;
   return {
     top_left: {
       x: coordinates.top_left.x + scrollX,
@@ -382,7 +384,7 @@ function getLoggingData(bids) {
     bids = [];
   }
   bids.forEach((bid) => {
-    let bidData = getBidData(bid);
+    const bidData = getBidData(bid);
     Object.keys(bidData).forEach((key) => {
       logData[key] = logData[key] || [];
       logData[key].push(encodeURIComponent(bidData[key]));
@@ -473,7 +475,7 @@ export const spec = {
     // convert Native ORTB definition to old-style prebid native definition
     bidRequests = convertOrtbRequestToProprietaryNative(bidRequests);
 
-    let payload = generatePayload(bidRequests, bidderRequests);
+    const payload = generatePayload(bidRequests, bidderRequests);
     return {
       method: 'POST',
       url: getBidderURL(bidderRequests.bidderCode, payload.ext.customer_id),
@@ -493,7 +495,7 @@ export const spec = {
       logInfo(`${BIDDER_CODE} : response is empty`);
       return validBids;
     }
-    let bids = serverResponse.body.bidList;
+    const bids = serverResponse.body.bidList;
     if (!isArray(bids) || bids.length === 0) {
       logInfo(`${BIDDER_CODE} : no bids`);
     } else {
@@ -506,7 +508,7 @@ export const spec = {
       return validBids;
     }
     if (ortbAuctionConfigs.length > 0) {
-      fledgeAuctionConfigs.push(...ortbAuctionConfigs.map(({igs}) => igs || []).flat());
+      fledgeAuctionConfigs.push(...ortbAuctionConfigs.map(({ igs }) => igs || []).flat());
     }
     return {
       bids: validBids,
@@ -514,14 +516,14 @@ export const spec = {
     }
   },
   getUserSyncs: function(syncOptions, serverResponses) {
-    let cookieSyncUrls = fetchCookieSyncUrls(serverResponses);
+    const cookieSyncUrls = fetchCookieSyncUrls(serverResponses);
 
     if (syncOptions.iframeEnabled) {
-      return filterBidsListByFilters(cookieSyncUrls, {type: 'iframe'});
+      return filterBidsListByFilters(cookieSyncUrls, { type: 'iframe' });
     }
 
     if (syncOptions.pixelEnabled) {
-      return filterBidsListByFilters(cookieSyncUrls, {type: 'image'});
+      return filterBidsListByFilters(cookieSyncUrls, { type: 'image' });
     }
   },
 
@@ -530,7 +532,7 @@ export const spec = {
    */
   onTimeout: (timeoutData) => {
     try {
-      let eventData = {
+      const eventData = {
         name: EVENTS.TIMEOUT_EVENT_NAME,
         value: timeoutData.length,
         relatedData: timeoutData[0].timeout || config.getConfig('bidderTimeout')
@@ -544,7 +546,7 @@ export const spec = {
    */
   onBidWon: (bid) => {
     try {
-      let eventData = {
+      const eventData = {
         name: EVENTS.BID_WON_EVENT_NAME,
         value: bid.cpm
       };
@@ -554,7 +556,7 @@ export const spec = {
 
   onSetTargeting: (bid) => {
     try {
-      let eventData = {
+      const eventData = {
         name: EVENTS.SET_TARGETING,
         value: bid.cpm
       };
@@ -565,9 +567,9 @@ export const spec = {
     } catch (e) {}
   },
 
-  onBidderError: ({error, bidderRequest}) => {
+  onBidderError: ({ error, bidderRequest }) => {
     try {
-      let eventData = {
+      const eventData = {
         name: EVENTS.BIDDER_ERROR,
         relatedData: `timedOut:${error.timedOut}|status:${error.status}|message:${error.reason.message}`
       };
