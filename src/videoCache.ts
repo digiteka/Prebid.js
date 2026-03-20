@@ -111,6 +111,16 @@ declare module './config' {
   }
 }
 /**
+ * DIGITEKA : Function which change the AdSystem Element from the VAST XML Response
+ *
+ * @param {string} vastXml The XML Vast Response
+ * @return XML.
+ */
+function wrapVastXml(vastXml) {
+  return vastXml.replace(/<AdSystem.*>.*<\/AdSystem>/, '<AdSystem>prebid.org wrapper</AdSystem>');
+}
+
+/**
  * Wraps a bid in the format expected by the prebid-server endpoints, or returns null if
  * the bid can't be converted cleanly.
  *
@@ -185,7 +195,8 @@ function shimStorageCallback(done: VideoCacheStoreCallback) {
 }
 
 function getVastXml(bid) {
-  return bid.vastXml ? bid.vastXml : wrapURI(bid.vastUrl, bid.vastImpUrl);
+  //Digiteka overwrite
+  return bid.vastXml ? wrapVastXml(bid.vastXml) : wrapURI(bid.vastUrl, bid.vastImpUrl);
 };
 
 /**
