@@ -40,6 +40,8 @@ const INTEG_SERVER_PORT = 4444;
 const { spawn, fork } = require('child_process');
 const TerserPlugin = require('terser-webpack-plugin');
 
+const TEST_CHUNKS = 4;
+
 // these modules must be explicitly listed in --modules to be included in the build, won't be part of "all" modules
 var explicitModules = [
   'pre1api'
@@ -83,7 +85,7 @@ function lint(done) {
   if (argv.nolint) {
     return done();
   }
-  const args = ['eslint'];
+  const args = ['eslint', '--cache', '--cache-strategy', 'content'];
   if (!argv.nolintfix) {
     args.push('--fix');
   }
@@ -165,7 +167,11 @@ function makeDevpackPkg(config = webpackConfig) {
       mode: 'development'
     })
 
-    const babelConfig = require('./babelConfig.js')({disableFeatures: helpers.getDisabledFeatures(), prebidDistUrlBase: argv.distUrlBase || '/build/dev/'});
+    const babelConfig = require('./babelConfig.js')({
+      disableFeatures: helpers.getDisabledFeatures(),
+      prebidDistUrlBase: argv.distUrlBase || '/build/dev/',
+      ES5: argv.ES5 // Pass ES5 flag to babel config
+    });
 
     // update babel config to set local dist url
     cloned.module.rules
@@ -421,7 +427,7 @@ function runKarma(options, done) {
   options = Object.assign({browsers: helpers.parseBrowserArgs(argv)}, options)
   const env = Object.assign({}, options.env, process.env);
   if (!env.TEST_CHUNKS) {
-    env.TEST_CHUNKS = '4';
+    env.TEST_CHUNKS = TEST_CHUNKS;
   }
   const child = fork('./karmaRunner.js', null, {
     env
@@ -445,9 +451,13 @@ function testCoverage(done) {
     file: argv.file,
     env: {
       NODE_OPTIONS: '--max-old-space-size=8096',
-      TEST_CHUNKS: '1'
+      TEST_CHUNKS
     }
   }, done);
+}
+
+function mergeCoverage() {
+  return execaTask(`npx lcov-result-merger 'build/coverage/chunks/*/*.info' build/coverage/lcov.info`)();
 }
 
 function coveralls() { // 2nd arg is a dependency: 'test' must be finished
@@ -547,7 +557,7 @@ gulp.task('test-only', test);
 gulp.task('test-all-features-disabled', testTaskMaker({disableFeatures: require('./features.json'), oneBrowser: 'chrome', watch: false}));
 gulp.task('test', gulp.series(clean, lint, 'test-all-features-disabled', 'test-only'));
 
-gulp.task('test-coverage', gulp.series(clean, testCoverage));
+gulp.task('test-coverage', gulp.series(clean, testCoverage, mergeCoverage));
 gulp.task(viewCoverage);
 
 gulp.task('coveralls', gulp.series('test-coverage', coveralls));
