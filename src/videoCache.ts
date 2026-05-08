@@ -117,7 +117,8 @@ declare module './config' {
  * @return XML.
  */
 function wrapVastXml(vastXml) {
-  return vastXml.replace(/<AdSystem.*>.*<\/AdSystem>/, '<AdSystem>prebid.org wrapper</AdSystem>');
+  console.log('guigui', vastXml);
+  return vastXml.replace(/<AdSystem.*>.*<\/AdSystem>/, '<AdSystem>prebid.org wrapper [adId]</AdSystem>');
 }
 
 /**
