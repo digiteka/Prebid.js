@@ -116,9 +116,8 @@ declare module './config' {
  * @param {string} vastXml The XML Vast Response
  * @return XML.
  */
-function wrapVastXml(vastXml) {
-  console.log('guigui', vastXml);
-  return vastXml.replace(/<AdSystem.*>.*<\/AdSystem>/, '<AdSystem>prebid.org wrapper [adId]</AdSystem>');
+function wrapVastXml(bid) {
+  return bid.vastXml.replace(/<AdSystem.*>.*<\/AdSystem>/, `<AdSystem>prebid.org wrapper [${bid.adId}]</AdSystem>`);
 }
 
 /**
@@ -197,7 +196,7 @@ function shimStorageCallback(done: VideoCacheStoreCallback) {
 
 function getVastXml(bid) {
   //Digiteka overwrite
-  return bid.vastXml ? wrapVastXml(bid.vastXml) : wrapURI(bid.vastUrl, bid.vastImpUrl);
+  return bid.vastXml ? wrapVastXml(bid) : wrapURI(bid.vastUrl, bid.vastImpUrl);
 };
 
 /**
