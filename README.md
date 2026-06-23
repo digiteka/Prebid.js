@@ -3,7 +3,13 @@
 
 ## Configuration spécifique Digiteka
 
-### 1. Montée de version de la librairie : 
+### 1. Fonctionnement du process Prebid
+
+![alt text][logo-pbjs]
+
+[logo-pbjs]: ./Workflow-Prebid.jpg "Workflow Prebid"
+
+### 2. Montée de version de la librairie : 
 
 * `git checkout master` <br>
 * `git pull master` <br>
@@ -15,11 +21,11 @@
 * `git push --set-upstream origin YYY` -> La branche Digiteka sera automatiquement chargée sur [Amplify](https://eu-west-1.console.aws.amazon.com/amplify/apps/dnd6gr8veismm/overview)
 * Effectuer une PR sur Github en direction du repository Digiteka et non Prebid.org
 
-![alt text][logo]
+![alt text][logo-dtk]
 
-[logo]: ./GitFlow-Prebid.jpg "Gitflow Digiteka"
+[logo-dtk]: ./GitFlow-Digiteka.jpg "Gitflow Digiteka"
 
-### 2. Mise en production
+### 3. Mise en production
 
 * Vérifier la présence de `globalVarName: "pbjsDtk"` dans **Prebid/package.json**<br>
 * Pour un nouveau bidder à ajouter: màj de **Prebid/modules.json** + Player/Prebid:gvlIds<br>
