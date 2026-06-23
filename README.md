@@ -15,8 +15,9 @@
 * `git push --set-upstream origin YYY` -> La branche Digiteka sera automatiquement chargée sur [Amplify](https://eu-west-1.console.aws.amazon.com/amplify/apps/dnd6gr8veismm/overview)
 * Effectuer une PR sur Github en direction du repository Digiteka et non Prebid.org
 
-[Gitflow](./GitFlow Prebid.png)
+![alt text][logo]
 
+[logo]: ./GitFlow-Prebid.png "Gitflow Digiteka"
 
 ### 2. Mise en production
 
