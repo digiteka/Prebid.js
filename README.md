@@ -17,7 +17,7 @@
 
 ![alt text][logo]
 
-[logo]: ./GitFlow-Prebid.png "Gitflow Digiteka"
+[logo]: ./GitFlow-Prebid.jpg "Gitflow Digiteka"
 
 ### 2. Mise en production
 
