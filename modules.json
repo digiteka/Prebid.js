@@ -1,6 +1,5 @@
 [
   "adagioBidAdapter",
-  "adlooxAnalyticsAdapter",
   "adyoulikeBidAdapter",
   "amxBidAdapter",
   "aniviewBidAdapter",
@@ -30,11 +29,9 @@
   "tripleliftBidAdapter",
   "ttdBidAdapter",
   
-  "adlooxRtdProvider",
   "greenbidsRtdProvider",
   "iasRtdProvider",
   "nodalsAiRtdProvider",
-  "sirdataRtdProvider",
   "weboramaRtdProvider",
   
   "amxIdSystem",
