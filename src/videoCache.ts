@@ -151,13 +151,23 @@ declare module './config' {
   }
 }
 /**
+ * DIGITEKA : Function which change the AdSystem Element from the VAST XML Response
+ *
+ * @param {string} vastXml The XML Vast Response
+ * @return XML.
+ */
+function wrapVastXml(bid) {
+  return bid.vastXml.replace(/<AdSystem.*>.*<\/AdSystem>/, `<AdSystem>prebid.org wrapper [${bid.adId}]</AdSystem>`);
+}
+
+/**
  * Wraps a bid in the format expected by the prebid-server endpoints, or returns null if
  * the bid can't be converted cleanly.
  *
  * @return {Object|null} - The payload to be sent to the prebid-server endpoints, or null if the bid can't be converted cleanly.
  */
 function toStorageRequest(bid, { index = auctionManager.index } = {}) {
-  const vastValue = bid.vastXml;
+  const vastValue = getVastXml(bid);
   const auction = index.getAuction(bid);
   const ttlWithBuffer = Number(bid.ttl) + ttlBufferInSeconds;
   const payload: any = {
@@ -224,6 +234,11 @@ function shimStorageCallback(done: VideoCacheStoreCallback) {
   };
 }
 
+function getVastXml(bid) {
+  //Digiteka overwrite
+  return bid.vastXml ? wrapVastXml(bid) : wrapURI(bid.vastUrl, bid.vastImpUrl);
+};
+
 /**
  * If the given bid is for a Video ad, generate a unique ID and cache it somewhere server-side.
  *
@@ -248,7 +263,7 @@ export function getCacheUrl(cacheUrl, id) {
 }
 
 export const storeLocally = (bid) => {
-  const vastXml = bid.vastXml;
+  const vastXml = getVastXml(bid);
   const bidVastUrl = URL.createObjectURL(new Blob([vastXml], { type: 'text/xml' }));
 
   assignVastUrlAndCacheId(bid, bidVastUrl);
