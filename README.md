@@ -1,7 +1,50 @@
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/prebid/Prebid.js.svg)](https://isitmaintained.com/project/prebid/Prebid.js "Percentage of issues still open")
-[![Coverage Status](https://coveralls.io/repos/github/prebid/Prebid.js/badge.svg?branch=master)](https://coveralls.io/github/prebid/Prebid.js?branch=master)
-
 # Prebid.js
+
+
+## Configuration spécifique Digiteka
+
+### 1. Fonctionnement du process Prebid
+
+![alt text][logo-pbjs]
+
+[logo-pbjs]: ./Workflow-Prebid.jpg "Workflow Prebid"
+
+### 2. Montée de version de la librairie : 
+
+* `git checkout master` <br>
+* `git pull master` <br>
+* `git checkout all_versions` -> Branche stockant toutes les versions de Prebid JS, ne pas la modifier ni la détruire <br>
+* `git pull git@github.com:prebid/Prebid.js.git --tags` -> Téléchargement de toutes les versions officielles disponibles <br>
+* `git checkout XXX` -> XXX = n° de tag officiel d’une branche de Prebid à cibler, ex: 2.1.0 <br>
+* `git checkout -b YYY` -> YYY = Création d’une nouvelle branche Digiteka avec le n° de la nouvelle version à utiliser (ex: 2.1) <br>
+* `git merge master` -> Récupération des configurations spécifiques à Digiteka déjà présentes en prod<br>
+* `git push --set-upstream origin YYY` -> La branche Digiteka sera automatiquement chargée sur [Amplify](https://eu-west-1.console.aws.amazon.com/amplify/apps/dnd6gr8veismm/overview)
+* Effectuer une PR sur Github en direction du repository Digiteka et non Prebid.org
+
+![alt text][logo-dtk]
+
+[logo-dtk]: ./GitFlow-Digiteka.jpg "Gitflow Digiteka"
+
+### 3. Mise en production
+
+* Vérifier la présence de `globalVarName: "pbjsDtk"` dans **Prebid/package.json**<br>
+* Pour un nouveau bidder à ajouter: màj de **Prebid/modules.json** + Player/Prebid:gvlIds<br>
+* S'assurer que `getVastXml()` dans **Prebid/videoCache.js** contient encore les modificiations Digiteka
+
+Une fois le déploiement terminé, le fichier sera accessible sur
+[https://[nom-de-la-branche].dnd6gr8veismm.amplifyapp.com/build/dist/pbLibrary.js](https://[nom-de-la-branche].dnd6gr8veismm.amplifyapp.com/build/dist/pbLibrary.js)
+
+* Merger la branche sur master<br>
+* [Attendre que le build soit fait sur Amplify](https://eu-west-1.console.aws.amazon.com/amplify/apps/dnd6gr8veismm/branches/master/deployments)<br>
+* [Récupérer le fichier pbLibrary.js](https://master.dnd6gr8veismm.amplifyapp.com/build/dist/pbLibrary.js)<br>
+* L’uploader sur [Amazon S3](https://s3.console.aws.amazon.com/s3/buckets/s3-static.outstream.digiteka.com?region=eu-west-1) **en public** (Autorisation > Liste de contrôle d'accès)<br>
+* Modifier la version sur [CHEF](https://github.com/digiteka/dgchef/blob/master-ubuntu-1804/cookbooks/ultimedia/templates/default/services.yaml.erb)<br>
+`prebidVersion: XXX` (l.13) (Numéro de version de Prebid si MAJ, sinon, version mineure (ex : 6.22.1) en cas d’ajout simple de module/adapter)
+* MEP dans le vide de la Delivery
+
+---
+
+## Configuration générale Prebid
 
 > A free and open source library for publishers to quickly implement header bidding.
 
@@ -9,7 +52,6 @@ This README is for developers who want to contribute to Prebid.js.
 Additional documentation can be found at [the Prebid.js documentation homepage](https://docs.prebid.org/prebid/prebidjs.html).
 Working examples can be found in [the developer docs](https://prebid.org/dev-docs/getting-started.html).
 
-Prebid.js is open source software that is offered for free as a convenience. While it is designed to help companies address legal requirements associated with header bidding, we cannot and do not warrant that your use of Prebid.js will satisfy legal requirements. You are solely responsible for ensuring that your use of Prebid.js complies with all applicable laws.  We strongly encourage you to obtain legal advice when using Prebid.js to ensure your implementation complies with all laws where you operate.
 
 **Table of Contents**
 
@@ -18,43 +60,6 @@ Prebid.js is open source software that is offered for free as a convenience. Whi
 - [Build](#Build)
 - [Run](#Run)
 - [Contribute](#Contribute)
-
-<a name="Usage"></a>
-
-## Usage (as a npm dependency)
-
-**Note**: versions prior to v10 required some Babel plugins to be configured when used as an NPM dependency -
-refer to [v9 README](https://github.com/prebid/Prebid.js/blob/9.43.0/README.md). See also [customize build options](#customize-options)
-
-```javascript
-import pbjs from 'prebid.js';
-import 'prebid.js/modules/rubiconBidAdapter'; // imported modules will register themselves automatically with prebid
-import 'prebid.js/modules/appnexusBidAdapter';
-pbjs.processQueue();  // required to process existing pbjs.queue blocks and setup any further pbjs.queue execution
-
-pbjs.requestBids({
-  ...
-})
-```
-
-You can import just type definitions for every module from `types.d.ts`, and for the `pbjs` global from `global.d.ts`:
-
-```typescript
-import 'prebid.js/types.d.ts';
-import 'prebid.js/global.d.ts';
-pbjs.que.push(/* ... */)
-```
-
-Or, if your Prebid bundle uses a different global variable name:
-
-```typescript
-import type {PrebidJS} from 'prebid.js/types.d.ts';
-declare global {
-    interface Window {
-        myCustomPrebidGlobal: PrebidJS;
-    }
-}
-```
 
 <a id="customize-options"></a>
 
@@ -159,78 +164,9 @@ With `modules.json` containing the following
 ]
 ```
 
-**Build prebid.js using npm for bundling**
 
-In case you'd like to explicitly show that your project uses `prebid.js` and want a reproducible build, consider adding it as an `npm` dependency.
 
-- Add `prebid.js` as a `npm` dependency of your project: `npm install prebid.js`
-- Run the `prebid.js` build under the `node_modules/prebid.js/` folder
 
-        $ gulp build --modules=path/to/your/list-of-modules.json
-
-Most likely your custom `prebid.js` will only change when there's:
-
-- A change in your list of modules
-- A new release of `prebid.js`
-
-Having said that, you are probably safe to check your custom bundle into your project.  You can also generate it in your build process.
-
-**Build once, bundle multiple times**
-
-If you need to generate multiple distinct bundles from the same Prebid version, you can reuse a single build with:
-
-```
-gulp build
-gulp bundle --tag one --modules=one.json
-gulp bundle --tag two --modules=two.json
-```
-
-This generates slightly larger files, but has the advantage of being much faster to run (after the initial `gulp build`). It's also the method used by [the Prebid.org download page](https://docs.prebid.org/download.html).
-
-<a name="Run"></a>
-
-### Excluding particular features from the build
-
-Since version 7.2.0, you may instruct the build to exclude code for some features - for example, if you don't need support for native ads:
-
-```
-gulp build --disable NATIVE --modules=openxBidAdapter,rubiconBidAdapter,sovrnBidAdapter # substitute your module list
-```
-
-Features that can be disabled this way are:
-
- - `VIDEO` - support for video bids;
- - `NATIVE` - support for native bids;
-- `UID2_CSTG` - support for UID2 client side token generation (see [Unified ID 2.0](https://docs.prebid.org/dev-docs/modules/userid-submodules/unified2.html))
-- `GREEDY` - disables the use blocking, "greedy" promises within Prebid (see [note](#greedy-promise)).
-- `LOG_NON_ERROR` - support for non-error console messages. (see [note](#log-features))
-- `LOG_ERROR` - support for error console messages (see [note](#log-features))
-
-`GREEDY` is disabled and all other features are enabled when no features are explicitly chosen. Use `--enable GREEDY` on the `gulp build` command or remove it from `disableFeatures` to restore the original behavior. If you disable any feature, you must explicitly also disable `GREEDY` to get the default behavior on promises.
-
-<a id="greedy-promise"></a>
-
-#### Greedy promises
-
-When `GREEDY` is enabled, Prebid attempts to hold control of the main thread when possible, using a [custom implementation of `Promise`](https://github.com/prebid/Prebid.js/blob/master/libraries/greedy/greedyPromise.js) that does not submit callbacks to the scheduler once the promise is resolved (running them immediately instead).
-Disabling this behavior instructs Prebid to use the standard `window.Promise` instead; this has the effect of breaking up task execution, making them slower overall but giving the browser more chances to run other tasks in between, which can improve UX.         
-
-You may also override the `Promise` constructor used by Prebid through `pbjs.Promise`, for example:
-
-```javascript
-var pbjs = pbjs || {};
-pbjs.Promise = myCustomPromiseConstructor;
-```
-
-<a id="log-features"></a>
-
-#### Logging
-
-Disabling `LOG_NON_ERROR` and `LOG_ERROR` removes most logging statements from source, which can save on bundle size. Beware, however, that there is no test coverage with either of these disabled. Turn them off at your own risk.
-
-Disabling logging — especially `LOG_ERROR` — also makes debugging more difficult. Consider building a separate version with logging enabled for debugging purposes.
-
-We suggest running the build with logging off only if you are able to confirm a real world metric improvement via a testing framework. Using this build without such a framework may result in unexpectedly worse performance.
 
 ## Unminified code
 
@@ -350,25 +286,8 @@ To run the example file, go to:
 
 As you make code changes, the bundles will be rebuilt and the page reloaded automatically.
 
-<a name="Contribute"></a>
 
-## Contribute
 
-Many SSPs, bidders, and publishers have contributed to this project. [Hundreds of bidders](https://github.com/prebid/Prebid.js/tree/master/modules) are supported by Prebid.js.
-
-For guidelines, see [Contributing](./CONTRIBUTING.md).
-
-Our PR review process can be found [here](https://github.com/prebid/Prebid.js/tree/master/PR_REVIEW.md).
-
-### Add a Bidder Adapter
-
-To add a bidder adapter module, see the instructions in [How to add a bidder adapter](https://docs.prebid.org/dev-docs/bidder-adaptor.html).
-
-### Code Quality
-
-Code quality is defined by `.eslintrc` and errors are reported in the terminal.
-
-If you are contributing code, you should [configure your editor](http://eslint.org/docs/user-guide/integrations#editors) with the provided `.eslintrc` settings.
 
 ### Unit Testing with Karma
 
@@ -394,10 +313,3 @@ The results will be in
 
 For instructions on writing tests for Prebid.js, see [Testing Prebid.js](https://prebid.org/dev-docs/testing-prebid.html).
 
-### Supported Browsers
-
-Prebid.js is supported on IE11 and modern browsers until 5.x. 6.x+ transpiles to target >0.25%; not dead; not Opera Mini; not IE11.
-
-### Governance
-Review our governance model [here](https://github.com/prebid/Prebid.js/tree/master/governance.md).
-### END
