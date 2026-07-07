@@ -442,8 +442,8 @@ describe('LiveIntentExternalId', function() {
   });
 
   it('should decode a nexxen id to a sTeparate object when present', function() {
-      const result = liveIntentExternalIdSubmodule.decode({ nonId: 'foo', nexxen: 'bar' }, defaultConfigParams);
-      expect(result).to.eql({'lipb': {'lipbid': 'foo', 'nonId': 'foo', 'nexxen': 'bar'}, 'nexxen': {'id': 'bar', 'ext': {'provider': 'liveintent.com'}}});
+    const result = liveIntentExternalIdSubmodule.decode({ nonId: 'foo', nexxen: 'bar' }, defaultConfigParams);
+    expect(result).to.eql({ 'lipb': { 'lipbid': 'foo', 'nonId': 'foo', 'nexxen': 'bar' }, 'nexxen': { 'id': 'bar', 'ext': { 'provider': 'liveintent.com' } } });
   });
 
   it('should decode the segments as part of lipb', function() {
