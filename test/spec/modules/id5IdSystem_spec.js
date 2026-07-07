@@ -1063,6 +1063,7 @@ describe('ID5 ID System', function () {
 
   describe('Request Bids Hook', function () {
     let adUnits, ortb2Fragments;
+    let adUnits, ortb2Fragments;
     let sandbox;
 
     beforeEach(function () {
@@ -1073,6 +1074,9 @@ describe('ID5 ID System', function () {
       coreStorage.removeDataFromLocalStorage(`${id5System.ID5_STORAGE_NAME}_last`);
       coreStorage.setDataInLocalStorage(id5System.ID5_STORAGE_NAME + '_cst', getConsentHash());
       adUnits = [getAdUnitMock()];
+      ortb2Fragments = {
+        global: {}
+      }
       ortb2Fragments = {
         global: {}
       }
@@ -1094,6 +1098,15 @@ describe('ID5 ID System', function () {
         config.setConfig(getFetchLocalStorageConfig());
 
         startAuctionHook(wrapAsyncExpects(done, () => {
+          expect(ortb2Fragments.global.user.ext.eids[0]).is.eql({
+            source: ID5_SOURCE,
+            uids: [{
+              id: ID5_STORED_ID,
+              atype: 1,
+              ext: {
+                linkType: ID5_STORED_LINK_TYPE
+              }
+            }]
           expect(ortb2Fragments.global.user.ext.eids[0]).is.eql({
             source: ID5_SOURCE,
             uids: [{
@@ -1126,6 +1139,16 @@ describe('ID5 ID System', function () {
                 provider: ID5_SOURCE
               }
             }]
+          expect(ortb2Fragments.global.user.ext.eids[0].uids[0].id).is.equal(ID5_STORED_ID);
+          expect(ortb2Fragments.global.user.ext.eids[1]).is.eql({
+            source: EUID_SOURCE,
+            uids: [{
+              id: EUID_STORED_ID,
+              atype: 3,
+              ext: {
+                provider: ID5_SOURCE
+              }
+            }]
           });
           done();
         }, { ortb2Fragments });
@@ -1139,6 +1162,12 @@ describe('ID5 ID System', function () {
         config.setConfig(getFetchLocalStorageConfig());
 
         startAuctionHook(wrapAsyncExpects(done, function () {
+          expect(ortb2Fragments.global.user.ext.eids[1]).is.eql({
+            source: TRUE_LINK_SOURCE,
+            uids: [{
+              id: TRUE_LINK_STORED_ID,
+              atype: 1
+            }]
           expect(ortb2Fragments.global.user.ext.eids[1]).is.eql({
             source: TRUE_LINK_SOURCE,
             uids: [{
@@ -1199,6 +1228,13 @@ describe('ID5 ID System', function () {
               atype: id5IdEidUid.atype,
               ext: id5IdEidUid.ext
             }]
+          expect(ortb2Fragments.global.user.ext.eids[0]).is.eql({
+            source: IDS_ID5ID.eid.source,
+            uids: [{
+              id: id5IdEidUid.id,
+              atype: id5IdEidUid.atype,
+              ext: id5IdEidUid.ext
+            }]
           });
           done();
         }), { ortb2Fragments });
@@ -1221,6 +1257,9 @@ describe('ID5 ID System', function () {
           const eids = ortb2Fragments.global.user.ext.eids;
           expect(eids[0]).is.eql(IDS_ID5ID.eid);
           expect(eids[1]).is.eql(IDS_EUID.eid);
+          const eids = ortb2Fragments.global.user.ext.eids;
+          expect(eids[0]).is.eql(IDS_ID5ID.eid);
+          expect(eids[1]).is.eql(IDS_EUID.eid);
           done();
         }), { ortb2Fragments });
       });
@@ -1239,6 +1278,7 @@ describe('ID5 ID System', function () {
         config.setConfig(getFetchLocalStorageConfig());
 
         startAuctionHook(wrapAsyncExpects(done, function () {
+          expect(ortb2Fragments.global.user.ext.eids[1]).is.eql(IDS_TRUE_LINK_ID.eid);
           expect(ortb2Fragments.global.user.ext.eids[1]).is.eql(IDS_TRUE_LINK_ID.eid);
           done();
         }), { ortb2Fragments });
@@ -1274,6 +1314,16 @@ describe('ID5 ID System', function () {
         config.setConfig(getFetchLocalStorageConfig());
 
         startAuctionHook(wrapAsyncExpects(done, function () {
+          expect(ortb2Fragments.global.user.ext.eids[1]).is.eql({
+            source: 'other-id.com',
+            inserter: 'id5-sync.com',
+            uids: [{
+              id: 'other-id-value',
+              atype: 2,
+              ext: {
+                provider: 'id5-sync.com'
+              }
+            }]
           expect(ortb2Fragments.global.user.ext.eids[1]).is.eql({
             source: 'other-id.com',
             inserter: 'id5-sync.com',

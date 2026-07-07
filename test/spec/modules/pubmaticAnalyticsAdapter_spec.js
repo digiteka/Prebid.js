@@ -5,6 +5,7 @@ import { config } from 'src/config.js';
 import { setConfig } from 'modules/currency.js';
 import { server } from '../../mocks/xhr.js';
 import { getGlobal } from 'src/prebidGlobal.js';
+import { getGlobal } from 'src/prebidGlobal.js';
 import 'src/prebid.js';
 
 const events = require('src/events');
@@ -71,6 +72,7 @@ const BID = {
   'floorData': {
     'cpmAfterAdjustments': 6.3,
     'enforcements': { 'enforceJS': true, 'enforcePBS': false, 'floorDeals': false, 'bidAdjustment': true },
+    'enforcements': { 'enforceJS': true, 'enforcePBS': false, 'floorDeals': false, 'bidAdjustment': true },
     'floorCurrency': 'USD',
     'floorRule': 'banner',
     'floorRuleValue': 1.1,
@@ -105,6 +107,7 @@ const BID2 = Object.assign({}, BID, {
   },
   meta: {
     advertiserDomains: ['example.com']
+    advertiserDomains: ['example.com']
   }
 });
 const BID3 = Object.assign({}, BID2, {
@@ -120,22 +123,27 @@ const MOCK = {
     'timestamp': 1519767010567,
     'auctionStatus': 'inProgress',
     'adUnits': [{
+    'adUnits': [{
       'code': '/19968336/header-bid-tag-1',
       'sizes': [[640, 480]],
+      'bids': [{
       'bids': [{
         'bidder': 'pubmatic',
         'params': {
           'publisherId': '1001'
         }
       }],
+      }],
       'transactionId': 'ca4af27a-6d02-4f90-949d-d5541fa12014'
     }
     ],
     'adUnitCodes': ['/19968336/header-bid-tag-1'],
     'bidderRequests': [{
+    'bidderRequests': [{
       'bidderCode': 'pubmatic',
       'auctionId': '25c6d7f5-699a-4bfc-87c9-996f915341fa',
       'bidderRequestId': '1be65d7958826a',
+      'bids': [{
       'bids': [{
         'bidder': 'pubmatic',
         'params': {
@@ -274,6 +282,7 @@ const MOCK = {
 
 function getLoggerJsonFromRequest(requestBody) {
   return JSON.parse(decodeURIComponent(requestBody));
+  return JSON.parse(decodeURIComponent(requestBody));
 }
 
 describe('pubmatic analytics adapter', function () {
@@ -318,6 +327,8 @@ describe('pubmatic analytics adapter', function () {
 
   describe('OW S2S', function () {
     this.beforeEach(function () {
+  describe('OW S2S', function () {
+    this.beforeEach(function () {
       pubmaticAnalyticsAdapter.enableAnalytics({
         options: {
           publisherId: 9999,
@@ -336,9 +347,11 @@ describe('pubmatic analytics adapter', function () {
     });
 
     this.afterEach(function () {
+    this.afterEach(function () {
       pubmaticAnalyticsAdapter.disableAnalytics();
     });
 
+    it('Pubmatic Won: No tracker fired', function () {
     it('Pubmatic Won: No tracker fired', function () {
       this.timeout(5000)
 
@@ -378,6 +391,7 @@ describe('pubmatic analytics adapter', function () {
     });
 
     it('Non-pubmatic won: logger, tracker fired', function () {
+    it('Non-pubmatic won: logger, tracker fired', function () {
       const APPNEXUS_BID = Object.assign({}, BID, {
         'bidder': 'appnexus',
         'adserverTargeting': {
@@ -394,22 +408,27 @@ describe('pubmatic analytics adapter', function () {
         'timestamp': 1519767010567,
         'auctionStatus': 'inProgress',
         'adUnits': [{
+        'adUnits': [{
           'code': '/19968336/header-bid-tag-1',
           'sizes': [[640, 480]],
+          'bids': [{
           'bids': [{
             'bidder': 'appnexus',
             'params': {
               'publisherId': '1001'
             }
           }],
+          }],
           'transactionId': 'ca4af27a-6d02-4f90-949d-d5541fa12014'
         }
         ],
         'adUnitCodes': ['/19968336/header-bid-tag-1'],
         'bidderRequests': [{
+        'bidderRequests': [{
           'bidderCode': 'appnexus',
           'auctionId': '25c6d7f5-699a-4bfc-87c9-996f915341fa',
           'bidderRequestId': '1be65d7958826a',
+          'bids': [{
           'bids': [{
             'bidder': 'appnexus',
             'params': {
@@ -530,9 +549,12 @@ describe('pubmatic analytics adapter', function () {
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.rd.pubid).to.equal('9999');
       expect(decodeURIComponent(data.rd.purl)).to.equal('http://www.test.com/page.html');
+      expect(data.rd.pubid).to.equal('9999');
+      expect(decodeURIComponent(data.rd.purl)).to.equal('http://www.test.com/page.html');
     })
   });
 
+  describe('when handling events', function () {
   describe('when handling events', function () {
     beforeEach(function () {
       pubmaticAnalyticsAdapter.enableAnalytics({
@@ -548,6 +570,7 @@ describe('pubmatic analytics adapter', function () {
       pubmaticAnalyticsAdapter.disableAnalytics();
     });
 
+    it('Logger: best case + win tracker', function () {
     it('Logger: best case + win tracker', function () {
       this.timeout(5000)
 
@@ -626,6 +649,7 @@ describe('pubmatic analytics adapter', function () {
       events.emit(BID_RESPONSE, MOCK.BID_RESPONSE[0]);
       events.emit(BID_RESPONSE, MOCK.BID_RESPONSE[1]);
       events.emit(BIDDER_DONE, MOCK.BIDDER_DONE);
+      events.emit(AUCTION_END, mockAuctionEnd);
       events.emit(AUCTION_END, mockAuctionEnd);
       events.emit(SET_TARGETING, MOCK.SET_TARGETING);
       events.emit(BID_WON, MOCK.BID_WON[0]);
@@ -728,7 +752,9 @@ describe('pubmatic analytics adapter', function () {
     });
 
     it('Logger: log floor fields when prebids floor shows setConfig in location property', function () {
+    it('Logger: log floor fields when prebids floor shows setConfig in location property', function () {
       const BID_REQUESTED_COPY = utils.deepClone(MOCK.BID_REQUESTED);
+      BID_REQUESTED_COPY['bids'][1]['floorData']['location'] = 'fetch';
       BID_REQUESTED_COPY['bids'][1]['floorData']['location'] = 'fetch';
 
       this.timeout(5000)
@@ -781,6 +807,8 @@ describe('pubmatic analytics adapter', function () {
 
     // done
     it('bidCpmAdjustment: USD: Logger: best case + win tracker', function () {
+    // done
+    it('bidCpmAdjustment: USD: Logger: best case + win tracker', function () {
       const bidCopy = utils.deepClone(BID);
       bidCopy.cpm = bidCopy.originalCpm * 2; //  bidCpmAdjustment => bidCpm * 2
       this.timeout(5000)
@@ -801,10 +829,40 @@ describe('pubmatic analytics adapter', function () {
       events.emit(BID_WON, MOCK.BID_WON[1]);
 
       clock.tick(3000 + 2000);
+      clock.tick(3000 + 2000);
       expect(requests.length).to.equal(3); // 1 logger and 2 win-tracker
       const request = requests[2]; // logger is executed late, trackers execute first
       expect(request.url).to.equal('https://t.pubmatic.com/wl?v=1&psrc=web');
       let data = getLoggerJsonFromRequest(request.requestBody);
+
+      // check mandatory fields
+      expect(data).to.have.property('sd');
+      expect(data).to.have.property('fd');
+      expect(data).to.have.property('rd');
+
+      expect(data.rd.pubid).to.equal('9999');
+      expect(data.rd.pid).to.equal('1111');
+      expect(data.rd.tgid).to.equal(0);
+      // floor data in featureList
+      expect(data.fd.flr.modelVersion).to.equal('floorModelTest');
+      expect(data.fd.flr).to.have.property('enforcements');
+      expect(data.fd.flr.enforcements).to.deep.equal({
+        enforceJS: true,
+        enforcePBS: false,
+        floorDeals: false,
+        bidAdjustment: true
+      });
+      expect(data.fd.flr.fetchStatus).to.equal('success');
+      expect(data.fd.flr.floorProvider).to.equal('pubmatic');
+      expect(data.fd.flr.location).to.equal('fetch');
+      expect(data.fd.flr.skipRate).to.equal(0);
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd).to.be.an('object');
+      expect(Object.keys(data.sd).length).to.equal(2);
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.bidGrossCpmUSD).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.bidPriceUSD).to.equal(2.46);
 
       // check mandatory fields
       expect(data).to.have.property('sd');
@@ -841,8 +899,11 @@ describe('pubmatic analytics adapter', function () {
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.v).to.equal('1');
       expect(data.psrc).to.equal('web');
+      expect(data.v).to.equal('1');
+      expect(data.psrc).to.equal('web');
     });
 
+    it('bidCpmAdjustment: JPY: Logger: best case + win tracker', function () {
     it('bidCpmAdjustment: JPY: Logger: best case + win tracker', function () {
       config.setConfig({
         testGroupId: 25
@@ -912,8 +973,11 @@ describe('pubmatic analytics adapter', function () {
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.v).to.equal('1');
       expect(data.psrc).to.equal('web');
+      expect(data.v).to.equal('1');
+      expect(data.psrc).to.equal('web');
     });
 
+    it('Logger: when bid is not submitted, default bid status 1 check: pubmatic set as s2s', function () {
     it('Logger: when bid is not submitted, default bid status 1 check: pubmatic set as s2s', function () {
       config.setConfig({
         testGroupId: '25'
@@ -948,8 +1012,15 @@ describe('pubmatic analytics adapter', function () {
       expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidderCode).to.equal('pubmatic');
       expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCpm).to.equal(1.23);
       expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCurrency).to.equal('USD');
+      expect(data.sd).to.have.property('/19968336/header-bid-tag-0');
+      expect(data.sd['/19968336/header-bid-tag-0'].dimensions).to.deep.equal([[640, 480]])
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].adapterCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidderCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCpm).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCurrency).to.equal('USD');
     });
 
+    it('Logger: post-timeout check without bid response', function () {
     it('Logger: post-timeout check without bid response', function () {
       // db = 1 and t = 1 means bidder did NOT respond with a bid but we got a timeout notification
       events.emit(AUCTION_INIT, MOCK.AUCTION_INIT);
@@ -976,6 +1047,7 @@ describe('pubmatic analytics adapter', function () {
       expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0]).to.not.have.property('bidResponse')
     });
 
+    it('Logger: post-timeout check with bid response', function () {
     it('Logger: post-timeout check with bid response', function () {
       // db = 1 and t = 1 means bidder did NOT respond with a bid but we got a timeout notification
 
@@ -1015,8 +1087,26 @@ describe('pubmatic analytics adapter', function () {
 
       expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].status).to.equal('error');
       expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mediaType).to.equal('banner');
+      expect(data.sd).to.have.property('/19968336/header-bid-tag-1');
+      expect(data.sd['/19968336/header-bid-tag-1'].dimensions).to.deep.equal([[1000, 300], [970, 250], [728, 90]]);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].adapterCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidderCode).to.equal('pubmatic');
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].params.kgpv).to.equal('this-is-a-kgpv');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0]).to.have.property('bidResponse');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCpm).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.dealId).to.equal('the-deal-id');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].partnerTimeToRespond).to.equal(944);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].clientLatencyTimeMs).to.equal(3214);
+      expect(data.rd.s2sls).to.deep.equal(['pubmatic']);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].status).to.equal('error');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mediaType).to.equal('banner');
     });
 
+    it('Logger: currency conversion check', function () {
     it('Logger: currency conversion check', function () {
       setUANull();
       setConfig({
@@ -1066,6 +1156,7 @@ describe('pubmatic analytics adapter', function () {
       expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mediaType).to.equal('banner');
     });
 
+    it('Logger: regexPattern in bid.params', function () {
     it('Logger: regexPattern in bid.params', function () {
       setUAMobile();
       const BID_REQUESTED_COPY = utils.deepClone(MOCK.BID_REQUESTED);
@@ -1124,8 +1215,11 @@ describe('pubmatic analytics adapter', function () {
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.v).to.equal('1');
       expect(data.psrc).to.equal('web');
+      expect(data.v).to.equal('1');
+      expect(data.psrc).to.equal('web');
     });
 
+    it('Logger: regexPattern in bid.bidResponse and url in adomain', function () {
     it('Logger: regexPattern in bid.bidResponse and url in adomain', function () {
       const BID2_COPY = utils.deepClone(BID2);
       BID2_COPY.regexPattern = '*';
@@ -1168,8 +1262,11 @@ describe('pubmatic analytics adapter', function () {
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.v).to.equal('1');
       expect(data.psrc).to.equal('web');
+      expect(data.v).to.equal('1');
+      expect(data.psrc).to.equal('web');
     });
 
+    it('Logger: regexPattern in bid.params', function () {
     it('Logger: regexPattern in bid.params', function () {
       const BID_REQUESTED_COPY = utils.deepClone(MOCK.BID_REQUESTED);
       BID_REQUESTED_COPY.bids[1].params.regexPattern = '*';
@@ -1220,14 +1317,49 @@ describe('pubmatic analytics adapter', function () {
       expect(data.sd['/19968336/header-bid-tag-1'].bidWonAdId).to.equal('fake_ad_id_2');
       expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.5);
 
+      // check mandatory fields
+      expect(data).to.have.property('sd');
+      expect(data).to.have.property('fd');
+      expect(data).to.have.property('rd');
+
+      expect(data.sd).to.have.property('/19968336/header-bid-tag-1');
+      expect(data.sd['/19968336/header-bid-tag-1'].dimensions).to.deep.equal([[1000, 300], [970, 250], [728, 90]]);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids).to.have.property('3bd4ebb1c900e2');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].adapterCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidderCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0]).to.have.property('bidResponse');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidId).to.equal('3bd4ebb1c900e2');
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.bidGrossCpmUSD).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.bidPriceUSD).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].params.regexPattern).to.equal("*");
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.dealId).to.equal('the-deal-id');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].partnerTimeToRespond).to.equal(944);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].clientLatencyTimeMs).to.equal(3214);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCpm).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mi).to.equal('matched-impression');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.meta.advertiserDomains).to.deep.equal(['example.com']);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mediaType).to.equal('banner');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.floorData.floorRuleValue).to.equal(1.1);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bidWonAdId).to.equal('fake_ad_id_2');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.5);
+
       let firstTracker = requests[1].url;
       expect(firstTracker.split('?')[0]).to.equal('https://t.pubmatic.com/wt');
       data = {};
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.v).to.equal('1');
       expect(data.psrc).to.equal('web');
+      expect(data.v).to.equal('1');
+      expect(data.psrc).to.equal('web');
     });
 
+    it('Logger: regexPattern in bid.bidResponse', function () {
     it('Logger: regexPattern in bid.bidResponse', function () {
       const BID2_COPY = utils.deepClone(BID2);
       BID2_COPY.regexPattern = '*';
@@ -1284,6 +1416,7 @@ describe('pubmatic analytics adapter', function () {
       expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.dealChannel).to.equal('PMP');
     });
 
+    it('Logger: to handle floor rejected bids', function () {
     it('Logger: to handle floor rejected bids', function () {
       this.timeout(5000)
 
@@ -1344,6 +1477,7 @@ describe('pubmatic analytics adapter', function () {
     });
 
     it('Logger: best case + win tracker in case of Bidder Aliases', function () {
+    it('Logger: best case + win tracker in case of Bidder Aliases', function () {
       MOCK.BID_REQUESTED['bids'][0]['bidder'] = 'pubmatic_alias';
       MOCK.BID_REQUESTED['bids'][0]['bidderCode'] = 'pubmatic_alias';
       adapterManager.aliasRegistry['pubmatic_alias'] = 'pubmatic';
@@ -1371,6 +1505,37 @@ describe('pubmatic analytics adapter', function () {
       const request = requests[2]; // logger is executed late, trackers execute first
       expect(request.url).to.equal('https://t.pubmatic.com/wl?v=1&psrc=web');
       let data = getLoggerJsonFromRequest(request.requestBody);
+      // check mandatory fields
+      expect(data).to.have.property('sd');
+      expect(data).to.have.property('fd');
+      expect(data).to.have.property('rd');
+
+      expect(data.rd.pubid).to.equal('9999');
+      expect(data.rd.pid).to.equal('1111');
+      expect(data.rd.pdvid).to.equal('20');
+      expect(data.rd.iid).to.equal('25c6d7f5-699a-4bfc-87c9-996f915341fa');
+      expect(data.rd.to).to.equal(3000);
+      expect(data.rd.purl).to.equal('http://www.test.com/page.html');
+      expect(data.rd.tst).to.equal(1519767016);
+      expect(data.rd.tgid).to.equal(15);
+
+      // floor data in featureList
+      expect(data.fd.flr.modelVersion).to.equal('floorModelTest');
+      expect(data.fd.flr).to.have.property('enforcements');
+      expect(data.fd.flr.enforcements).to.deep.equal({
+        enforceJS: true,
+        enforcePBS: false,
+        floorDeals: false,
+        bidAdjustment: true
+      });
+      expect(data.fd.flr.fetchStatus).to.equal('success');
+      expect(data.fd.flr.floorProvider).to.equal('pubmatic');
+      expect(data.fd.flr.location).to.equal('fetch');
+      expect(data.fd.flr.skipRate).to.equal(0);
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd).to.be.an('object');
+      expect(Object.keys(data.sd).length).to.equal(2);
       // check mandatory fields
       expect(data).to.have.property('sd');
       expect(data).to.have.property('fd');
@@ -1432,7 +1597,60 @@ describe('pubmatic analytics adapter', function () {
       expect(data.sd['/19968336/header-bid-tag-0'].bidWonAdId).to.equal('fake_ad_id');
       expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.2);
 
+      expect(data.sd).to.have.property('/19968336/header-bid-tag-0');
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids).to.have.property('2ecff0db240757');
+      expect(data.sd['/19968336/header-bid-tag-0'].dimensions).to.deep.equal([[640, 480]])
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].adapterCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidderCode).to.equal('pubmatic_alias');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCpm).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0]).to.have.property('bidResponse');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidId).to.equal('2ecff0db240757');
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.bidGrossCpmUSD).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.bidPriceUSD).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].partnerTimeToRespond).to.equal(944);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].clientLatencyTimeMs).to.equal(3214);
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCpm).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.mediaType).to.equal('video');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.floorData.floorRuleValue).to.equal(1.1);
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bidWonAdId).to.equal('fake_ad_id');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.2);
+
       // slot 2
+      expect(data.sd).to.have.property('/19968336/header-bid-tag-1');
+      expect(data.sd['/19968336/header-bid-tag-1'].dimensions).to.deep.equal([[1000, 300], [970, 250], [728, 90]]);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids).to.have.property('3bd4ebb1c900e2');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].adapterCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidderCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0]).to.have.property('bidResponse');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidId).to.equal('3bd4ebb1c900e2');
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.bidGrossCpmUSD).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.bidPriceUSD).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].params.kgpv).to.equal("this-is-a-kgpv");
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.dealId).to.equal('the-deal-id');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].partnerTimeToRespond).to.equal(944);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].clientLatencyTimeMs).to.equal(3214);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCpm).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mi).to.equal('matched-impression');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.meta.advertiserDomains).to.deep.equal(['example.com']);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mediaType).to.equal('banner');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.floorData.floorRuleValue).to.equal(1.1);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bidWonAdId).to.equal('fake_ad_id_2');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.5);
       expect(data.sd).to.have.property('/19968336/header-bid-tag-1');
       expect(data.sd['/19968336/header-bid-tag-1'].dimensions).to.deep.equal([[1000, 300], [970, 250], [728, 90]]);
       expect(data.sd['/19968336/header-bid-tag-1'].bids).to.have.property('3bd4ebb1c900e2');
@@ -1467,8 +1685,11 @@ describe('pubmatic analytics adapter', function () {
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.v).to.equal('1');
       expect(data.psrc).to.equal('web');
+      expect(data.v).to.equal('1');
+      expect(data.psrc).to.equal('web');
     });
 
+    it('Logger: best case + win tracker in case of GroupM as alternate bidder', function () {
     it('Logger: best case + win tracker in case of GroupM as alternate bidder', function () {
       MOCK.BID_REQUESTED['bids'][0]['bidderCode'] = 'groupm';
       sandbox.stub(getGlobal(), 'getHighestCpmBids').callsFake((key) => {
@@ -1494,6 +1715,64 @@ describe('pubmatic analytics adapter', function () {
       const request = requests[2]; // logger is executed late, trackers execute first
       expect(request.url).to.equal('https://t.pubmatic.com/wl?v=1&psrc=web');
       let data = getLoggerJsonFromRequest(request.requestBody);
+      // check mandatory fields
+      expect(data).to.have.property('sd');
+      expect(data).to.have.property('fd');
+      expect(data).to.have.property('rd');
+
+      expect(data.rd.pubid).to.equal('9999');
+      expect(data.rd.pid).to.equal('1111');
+      expect(data.rd.pdvid).to.equal('20');
+      expect(data.rd.iid).to.equal('25c6d7f5-699a-4bfc-87c9-996f915341fa');
+      expect(data.rd.to).to.equal(3000);
+      expect(data.rd.purl).to.equal('http://www.test.com/page.html');
+      expect(data.rd.tst).to.equal(1519767016);
+      expect(data.rd.tgid).to.equal(15);
+
+      // floor data in feature list data
+      expect(data.fd.flr.modelVersion).to.equal('floorModelTest');
+      expect(data.fd.flr).to.have.property('enforcements');
+      expect(data.fd.flr.enforcements).to.deep.equal({
+        enforceJS: true,
+        enforcePBS: false,
+        floorDeals: false,
+        bidAdjustment: true
+      });
+      expect(data.fd.flr.fetchStatus).to.equal('success');
+      expect(data.fd.flr.floorProvider).to.equal('pubmatic');
+      expect(data.fd.flr.location).to.equal('fetch');
+      expect(data.fd.flr.skipRate).to.equal(0);
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd).to.be.an('object');
+      expect(Object.keys(data.sd).length).to.equal(2);
+
+      expect(data.sd).to.have.property('/19968336/header-bid-tag-0');
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids).to.have.property('2ecff0db240757');
+      expect(data.sd['/19968336/header-bid-tag-0'].dimensions).to.deep.equal([[640, 480]])
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].adapterCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidderCode).to.equal('groupm');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCpm).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0]).to.have.property('bidResponse');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidId).to.equal('2ecff0db240757');
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.bidGrossCpmUSD).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.bidPriceUSD).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].partnerTimeToRespond).to.equal(944);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].clientLatencyTimeMs).to.equal(3214);
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCpm).to.equal(1.23);
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.mediaType).to.equal('video');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.floorData.floorRuleValue).to.equal(1.1);
+
+      expect(data.sd['/19968336/header-bid-tag-0'].bidWonAdId).to.equal('fake_ad_id');
+      expect(data.sd['/19968336/header-bid-tag-0'].bids['2ecff0db240757'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.2);
       // check mandatory fields
       expect(data).to.have.property('sd');
       expect(data).to.have.property('fd');
@@ -1580,6 +1859,32 @@ describe('pubmatic analytics adapter', function () {
 
       expect(data.sd['/19968336/header-bid-tag-1'].bidWonAdId).to.equal('fake_ad_id_2');
       expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.5);
+      expect(data.sd).to.have.property('/19968336/header-bid-tag-1');
+      expect(data.sd['/19968336/header-bid-tag-1'].dimensions).to.deep.equal([[1000, 300], [970, 250], [728, 90]]);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids).to.have.property('3bd4ebb1c900e2');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].adapterCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidderCode).to.equal('pubmatic');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0]).to.have.property('bidResponse');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidId).to.equal('3bd4ebb1c900e2');
+      expect(data.fd.flr.skipped).to.equal(false);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.bidGrossCpmUSD).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.bidPriceUSD).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].params.kgpv).to.equal("this-is-a-kgpv");
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.dealId).to.equal('the-deal-id');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].partnerTimeToRespond).to.equal(944);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].clientLatencyTimeMs).to.equal(3214);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCpm).to.equal(1.52);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.originalCurrency).to.equal('USD');
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mi).to.equal('matched-impression');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.meta.advertiserDomains).to.deep.equal(['example.com']);
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.mediaType).to.equal('banner');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.floorData.floorRuleValue).to.equal(1.1);
+
+      expect(data.sd['/19968336/header-bid-tag-1'].bidWonAdId).to.equal('fake_ad_id_2');
+      expect(data.sd['/19968336/header-bid-tag-1'].bids['3bd4ebb1c900e2'][0].bidResponse.adserverTargeting.hb_pb).to.equal(1.5);
 
       // tracker slot1
       let firstTracker = requests[0].url;
@@ -1588,8 +1893,11 @@ describe('pubmatic analytics adapter', function () {
       firstTracker.split('?')[1].split('&').map(e => e.split('=')).forEach(e => data[e[0]] = e[1]);
       expect(data.v).to.equal('1');
       expect(data.psrc).to.equal('web');
+      expect(data.v).to.equal('1');
+      expect(data.psrc).to.equal('web');
     });
 
+    it('Logger: should verify display manager and version in analytics data', function () {
     it('Logger: should verify display manager and version in analytics data', function () {
       events.emit(AUCTION_INIT, MOCK.AUCTION_INIT);
       events.emit(BID_REQUESTED, MOCK.BID_REQUESTED);

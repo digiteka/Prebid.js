@@ -15,6 +15,7 @@ describe('Real time module', function () {
   let sandbox;
   let validSM, validSMWait, invalidSM, failureSM, nonConfSM, conf;
   let getBidRequestDataStub;
+  let getBidRequestDataStub;
 
   function mockEmitEvent(event, ...args) {
     (eventHandlers[event] || []).forEach((h) => h(...args));
@@ -23,6 +24,8 @@ describe('Real time module', function () {
   before(() => {
     eventHandlers = {};
     sandbox = sinon.createSandbox();
+    getBidRequestDataStub = sinon.stub();
+
     getBidRequestDataStub = sinon.stub();
 
     sandbox.stub(events, 'on').callsFake((event, handler) => {
@@ -45,6 +48,7 @@ describe('Real time module', function () {
         return { 'ad2': { 'key': 'validSM' } }
       },
       getBidRequestData: getBidRequestDataStub
+      getBidRequestData: getBidRequestDataStub
     };
 
     validSMWait = {
@@ -53,6 +57,7 @@ describe('Real time module', function () {
       getTargetingData: (adUnitsCodes) => {
         return { 'ad1': { 'key': 'validSMWait' } }
       },
+      getBidRequestData: getBidRequestDataStub
       getBidRequestData: getBidRequestDataStub
     };
 
@@ -116,6 +121,7 @@ describe('Real time module', function () {
 
   describe('', () => {
     let PROVIDERS, _detachers, rules;
+    let PROVIDERS, _detachers, rules;
 
     beforeEach(function () {
       PROVIDERS = [validSM, invalidSM, failureSM, nonConfSM, validSMWait];
@@ -135,6 +141,7 @@ describe('Real time module', function () {
     afterEach(function () {
       _detachers.forEach((f) => f());
       config.resetConfig();
+      rules.forEach(rule => rule());
       rules.forEach(rule => rule());
     });
 
@@ -184,7 +191,10 @@ describe('Real time module', function () {
       rtdModule.setBidRequestsData(() => {
         expect(request.ortb2Fragments.global.user.eids).to.eql(['id']);
         expect(request.ortb2Fragments.bidder.bidderB?.user?.yob).to.not.exist;
+        expect(request.ortb2Fragments.global.user.eids).to.eql(['id']);
+        expect(request.ortb2Fragments.bidder.bidderB?.user?.yob).to.not.exist;
         done();
+      }, request);
       }, request);
     });
 

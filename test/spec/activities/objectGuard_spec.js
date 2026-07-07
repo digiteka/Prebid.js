@@ -1,6 +1,8 @@
 import { objectGuard, writeProtectRule } from '../../../libraries/objectGuard/objectGuard.js';
 import { redactRule } from '../../../src/activities/redactor.js';
 import { mergeDeep } from 'src/utils.js';
+import {redactRule} from '../../../src/activities/redactor.js';
+import {mergeDeep} from 'src/utils.js';
 
 describe('objectGuard', () => {
   describe('read rule', () => {
@@ -38,6 +40,7 @@ describe('objectGuard', () => {
 
     it('does not choke if a guarded property is missing', () => {
       const obj = objectGuard([rule])({});
+      const obj = objectGuard([rule])({});
       expect(obj.foo).to.not.exist;
     });
 
@@ -57,6 +60,7 @@ describe('objectGuard', () => {
     });
 
     it('can prevent nested property access', () => {
+      const obj = objectGuard([rule])({
       const obj = objectGuard([rule])({
         other: 0,
         outer: {
@@ -96,6 +100,7 @@ describe('objectGuard', () => {
             foo: 1
           }
         }
+      }));
       }));
       expect(rule.applies.callCount).to.equal(1);
     });
@@ -303,6 +308,12 @@ describe('objectGuard', () => {
       expect(guard).to.eql({ outer: { inner: { bar: 'baz' } } });
     });
 
+    it('should prevent higher level deletes that would result in inner properties changing', () => {
+      const guard = objectGuard([rule])({outer: {inner: {bar: 'baz'}}});
+      delete guard.outer.inner;
+      expect(guard).to.eql({outer: {inner: {bar: 'baz'}}});
+    })
+
     it('should work on null properties', () => {
       const obj = { foo: null };
       const guard = objectGuard([rule])(obj);
@@ -358,4 +369,52 @@ describe('objectGuard', () => {
       });
     });
   });
+  describe('multiple rules on the same path', () => {
+    it('should each be checked for redacts', () => {
+      const obj = objectGuard([
+        redactRule({
+          paths: ['foo'],
+          applies: () => true,
+          get(val) {
+            return '1' + val;
+          }
+        }),
+        redactRule({
+          paths: ['foo'],
+          applies: () => true,
+          get(val) {
+            return '2' + val;
+          }
+        })
+      ])({foo: 'bar'});
+      expect(obj.foo).to.eql('21bar');
+    });
+
+    describe('when a property has both redact and write protect rules', () => {
+      let rules;
+      beforeEach(() => {
+        rules = [
+          redactRule({
+            paths: ['foo'],
+            applies: () => true,
+          }),
+          writeProtectRule({
+            paths: ['foo'],
+            applies: () => true,
+          })
+        ];
+      })
+      Object.entries({
+        'simple value': 'val',
+        'object value': {inner: 'val'}
+      }).forEach(([t, val]) => {
+        it(`can apply them both (on ${t})`, () => {
+          const obj = objectGuard(rules)({foo: val});
+          expect(obj.foo).to.not.exist;
+          obj.foo = {other: 'val'};
+          expect(obj.foo).to.not.exist;
+        })
+      })
+    })
+  })
 });

@@ -231,6 +231,9 @@ export const spec = {
     const endpoint = bidRequests[0].params.endpoint ? bidRequests[0].params.endpoint : REQUEST_URL;
     const url = replaceMacros(payload, endpoint);
 
+    const endpoint = bidRequests[0].params.endpoint ? bidRequests[0].params.endpoint : REQUEST_URL;
+    const url = replaceMacros(payload, endpoint);
+
     return {
       method: HTTP_METHOD,
       url: url,
