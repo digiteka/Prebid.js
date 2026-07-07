@@ -54,7 +54,6 @@ describe('ortb2Guard', () => {
         const insert = [{ n: 'new' }];
         deepSetValue(mod, prop, insert);
         mergeDeep(guard, mod);
-        mergeDeep(guard, mod);
         const actual = deepAccess(ortb2, prop);
         if (allowed) {
           expect(actual).to.eql(orig.concat(insert));
@@ -68,7 +67,6 @@ describe('ortb2Guard', () => {
         const ortb2 = {};
         deepSetValue(ortb2, prop, orig);
         const guard = ortb2Guard(ortb2, activityParams(MOD_TYPE, MOD_NAME));
-        deepSetValue(guard, `${prop}.0.n`, 'new');
         deepSetValue(guard, `${prop}.0.n`, 'new');
         const actual = deepAccess(ortb2, prop);
         if (allowed) {
@@ -103,7 +101,6 @@ describe('ortb2FragmentsGuard', () => {
   });
 
   it('should prevent changes to global FPD', () => {
-  it('should prevent changes to global FPD', () => {
     const fragments = {
       global: {
         foo: { inner: 'val' }
@@ -114,7 +111,6 @@ describe('ortb2FragmentsGuard', () => {
     expect(fragments.global.foo).to.eql({ inner: 'val' });
   });
 
-  it('should prevent changes to bidder FPD', () => {
   it('should prevent changes to bidder FPD', () => {
     const fragments = {
       bidder: {
@@ -128,7 +124,6 @@ describe('ortb2FragmentsGuard', () => {
     expect(fragments.bidder.A).to.eql({ foo: 'val' });
   });
 
-  it('should prevent changes to bidder FPD that was not initially there', () => {
   it('should prevent changes to bidder FPD that was not initially there', () => {
     const fragments = {
       bidder: {}

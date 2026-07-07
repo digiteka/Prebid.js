@@ -90,14 +90,6 @@ describe('Optable RTD Submodule', function () {
         window.dispatchEvent(event);
       }, 10);
 
-      // Dispatch event with empty ortb2 data after a short delay
-      setTimeout(() => {
-        const event = new CustomEvent('optable-targeting:change', {
-          detail: {}
-        });
-        window.dispatchEvent(event);
-      }, 10);
-
       await defaultHandleRtd(reqBidsConfigObj, {}, mergeFn);
       expect(mergeFn.called).to.be.false;
     });
@@ -113,14 +105,6 @@ describe('Optable RTD Submodule', function () {
     it('calls targeting function if no data is found in cache', async function () {
       const targetingData = { ortb2: { user: { ext: { optable: 'testData' } } } };
       window.optable.instance.targetingFromCache.returns(null);
-
-      // Dispatch event with targeting data after a short delay
-      setTimeout(() => {
-        const event = new CustomEvent('optable-targeting:change', {
-          detail: targetingData
-        });
-        window.dispatchEvent(event);
-      }, 10);
 
       // Dispatch event with targeting data after a short delay
       setTimeout(() => {
@@ -198,12 +182,6 @@ describe('Optable RTD Submodule', function () {
           targetingFromCache: sandbox.stub().returns(null)
         }
       };
-      window.optable = {
-        cmd: [],
-        instance: {
-          targetingFromCache: sandbox.stub().returns(null)
-        }
-      };
 
       getBidRequestData(reqBidsConfigObj, callback, moduleConfig, {});
 
@@ -224,7 +202,6 @@ describe('Optable RTD Submodule', function () {
       setTimeout(() => {
         expect(callback.calledOnce).to.be.true;
         done();
-      }, 100);
       }, 100);
     });
 
@@ -252,12 +229,6 @@ describe('Optable RTD Submodule', function () {
           targetingFromCache: sandbox.stub().returns(null)
         }
       };
-      window.optable = {
-        cmd: [],
-        instance: {
-          targetingFromCache: sandbox.stub().returns(null)
-        }
-      };
 
       getBidRequestData(reqBidsConfigObj, callback, moduleConfig, {});
 
@@ -278,14 +249,11 @@ describe('Optable RTD Submodule', function () {
         expect(callback.calledOnce).to.be.true;
         done();
       }, 100);
-      }, 100);
     });
 
     it("doesn't fail when optable is not available", function (done) {
       moduleConfig.params.bundleUrl = null;
-      moduleConfig.params.bundleUrl = null;
       delete window.optable;
-
 
       getBidRequestData(reqBidsConfigObj, callback, moduleConfig, {});
 
@@ -312,7 +280,6 @@ describe('Optable RTD Submodule', function () {
       setTimeout(() => {
         expect(callback.calledOnce).to.be.true;
         done();
-      }, 100);
       }, 100);
     });
   });

@@ -153,7 +153,7 @@ declare module './config' {
 /**
  * DIGITEKA : Function which change the AdSystem Element from the VAST XML Response
  *
- * @param {string} vastXml The XML Vast Response
+ * @param {object} bid The XML Vast Response
  * @return XML.
  */
 function wrapVastXml(bid) {
@@ -235,7 +235,7 @@ function shimStorageCallback(done: VideoCacheStoreCallback) {
 }
 
 function getVastXml(bid) {
-  //Digiteka overwrite
+  // Digiteka overwrite
   return bid.vastXml ? wrapVastXml(bid) : wrapURI(bid.vastUrl, bid.vastImpUrl);
 };
 

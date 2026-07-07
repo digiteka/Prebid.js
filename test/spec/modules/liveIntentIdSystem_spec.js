@@ -547,7 +547,7 @@ describe('LiveIntentId', function() {
 
   it('should decode a nexxen id to a separate object when present', function() {
     const result = liveIntentIdSubmodule.decode({ nonId: 'foo', nexxen: 'bar' }, defaultConfigParams);
-    expect(result).to.eql({'lipb': {'lipbid': 'foo', 'nonId': 'foo', 'nexxen': 'bar'}, 'nexxen': {'id': 'bar', 'ext': {'provider': 'liveintent.com'}}});
+    expect(result).to.eql({ 'lipb': { 'lipbid': 'foo', 'nonId': 'foo', 'nexxen': 'bar' }, 'nexxen': { 'id': 'bar', 'ext': { 'provider': 'liveintent.com' } } });
   });
 
   it('getId does not set the global variables when liModuleEnabled, liTreatmentRate and activatePartialTreatment are undefined', function() {
@@ -1202,37 +1202,37 @@ describe('LiveIntentId', function() {
     });
 
     it('nexxen', function () {
-        const userId = {
-          nexxen: { 'id': 'sample_id' }
-        };
-        const newEids = createEidsArray(userId);
-        expect(newEids.length).to.equal(1);
-        expect(newEids[0]).to.deep.equal({
-          source: 'liveintent.unrulymedia.com',
-          uids: [{
-            id: 'sample_id',
-            atype: 3
-          }]
-        });
+      const userId = {
+        nexxen: { 'id': 'sample_id' }
+      };
+      const newEids = createEidsArray(userId);
+      expect(newEids.length).to.equal(1);
+      expect(newEids[0]).to.deep.equal({
+        source: 'liveintent.unrulymedia.com',
+        uids: [{
+          id: 'sample_id',
+          atype: 3
+        }]
       });
+    });
 
-      it('nexxen with ext', function () {
-        const userId = {
-          nexxen: { 'id': 'sample_id', 'ext': { 'provider': 'some.provider.com' } }
-        };
-        const newEids = createEidsArray(userId);
-        expect(newEids.length).to.equal(1);
-        expect(newEids[0]).to.deep.equal({
-          source: 'liveintent.unrulymedia.com',
-          uids: [{
-            id: 'sample_id',
-            atype: 3,
-            ext: {
-              provider: 'some.provider.com'
-            }
-          }]
-        });
+    it('nexxen with ext', function () {
+      const userId = {
+        nexxen: { 'id': 'sample_id', 'ext': { 'provider': 'some.provider.com' } }
+      };
+      const newEids = createEidsArray(userId);
+      expect(newEids.length).to.equal(1);
+      expect(newEids[0]).to.deep.equal({
+        source: 'liveintent.unrulymedia.com',
+        uids: [{
+          id: 'sample_id',
+          atype: 3,
+          ext: {
+            provider: 'some.provider.com'
+          }
+        }]
       });
+    });
 
     it('tdid sets matcher for liveintent', function() {
       const userId = {

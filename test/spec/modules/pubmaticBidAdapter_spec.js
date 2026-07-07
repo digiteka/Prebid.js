@@ -67,8 +67,6 @@ describe('PubMatic adapter', () => {
       ext: {
         tid: '92489f71-1bf2-49a0-adf9-000cea934729',
         gpid: '/1111/homepage-leftnav',
-        tid: '92489f71-1bf2-49a0-adf9-000cea934729',
-        gpid: '/1111/homepage-leftnav',
         data: {
           pbadslot: '/1111/homepage-leftnav',
           adserver: {
@@ -181,7 +179,6 @@ describe('PubMatic adapter', () => {
     'seat': 'seat-id',
     'ext': {
       'buyid': 'BUYER-ID-987'
-      'buyid': 'BUYER-ID-987'
     },
     'bid': [{
       'id': '74858439-49D7-4169-BA5D-44A046315B2F',
@@ -204,7 +201,6 @@ describe('PubMatic adapter', () => {
   firstResponse = {
     'seat': 'seat-id',
     'ext': {
-      'buyid': 'BUYER-ID-987'
       'buyid': 'BUYER-ID-987'
     },
     'bid': [{
@@ -229,16 +225,10 @@ describe('PubMatic adapter', () => {
       cur: 'USD',
       id: '93D3BAD6-E2E2-49FB-9D89-920B1761C865',
       seatbid: [firstResponse]
-      cur: 'USD',
-      id: '93D3BAD6-E2E2-49FB-9D89-920B1761C865',
-      seatbid: [firstResponse]
     }
   };
   videoResponse = {
     'body': {
-      cur: 'USD',
-      id: '93D3BAD6-E2E2-49FB-9D89-920B1761C865',
-      seatbid: [videoBid]
       cur: 'USD',
       id: '93D3BAD6-E2E2-49FB-9D89-920B1761C865',
       seatbid: [videoBid]
@@ -324,16 +314,10 @@ describe('PubMatic adapter', () => {
       const isValid = spec.isBidRequestValid(bid);
       expect(isValid).to.equal(false);
     });
-      const isValid = spec.isBidRequestValid(bid);
-      expect(isValid).to.equal(false);
-    });
 
     it('should return false if publisherId is not of type string', () => {
       const bid = utils.deepClone(validBidRequests[0]);
       bid.params.publisherId = 5890;
-      const isValid = spec.isBidRequestValid(bid);
-      expect(isValid).to.equal(false);
-    });
       const isValid = spec.isBidRequestValid(bid);
       expect(isValid).to.equal(false);
     });
@@ -343,7 +327,6 @@ describe('PubMatic adapter', () => {
         beforeEach(() => {
           videoBidRequest = utils.deepClone(validBidRequests[0]);
           delete videoBidRequest.mediaTypes.banner;
-          delete videoBidRequest.mediaTypes.native;
           delete videoBidRequest.mediaTypes.native;
           videoBidRequest.mediaTypes.video = {
             playerSize: [
@@ -361,8 +344,6 @@ describe('PubMatic adapter', () => {
         it('should return false if mimes are missing in a video impression request', () => {
           const isValid = spec.isBidRequestValid(videoBidRequest);
           expect(isValid).to.equal(false);
-          const isValid = spec.isBidRequestValid(videoBidRequest);
-          expect(isValid).to.equal(false);
         });
 
         it('should return false if context is missing in a video impression request', () => {
@@ -375,15 +356,8 @@ describe('PubMatic adapter', () => {
           videoBidRequest.mediaTypes.video.mimes = ['video/flv'];
           videoBidRequest.mediaTypes.video.context = 'outstream';
 
-
           videoBidRequest.mediaTypes.banner = {
             sizes: [[728, 90], [160, 600]]
-          };
-
-          // Remove width and height from the video object to test coverage for missing values
-          delete videoBidRequest.mediaTypes.video.width;
-          delete videoBidRequest.mediaTypes.video.height;
-
           };
 
           // Remove width and height from the video object to test coverage for missing values
@@ -395,11 +369,6 @@ describe('PubMatic adapter', () => {
         });
 
         it('should return false if outstreamAU or renderer is missing', () => {
-          const isValid = spec.isBidRequestValid(videoBidRequest);
-          expect(isValid).to.equal(false);
-        });
-
-        it('should return TRUE if outstreamAU or renderer is present', () => {
           const isValid = spec.isBidRequestValid(videoBidRequest);
           expect(isValid).to.equal(false);
         });
@@ -437,13 +406,6 @@ describe('PubMatic adapter', () => {
         expect(imp).to.be.an('array');
         expect(imp[0]).to.have.property('banner');
         expect(imp[0]).to.have.property('id').equal('3736271c3c4b27');
-      });
-
-      it('should have build request with alias bidder', () => {
-        getGlobal().aliasBidder('pubmatic', PUBMATIC_ALIAS_BIDDER);
-        const request = spec.buildRequests(validAliasBidRequests, bidderAliasRequest);
-        expect(request.data).to.have.property('ext').to.have.property('wrapper').to.have.property('biddercode');
-        expect(request.data.ext.wrapper.biddercode).to.equal(PUBMATIC_ALIAS_BIDDER);
       });
 
       it('should have build request with alias bidder', () => {
@@ -652,7 +614,6 @@ describe('PubMatic adapter', () => {
               placement: 2,
               plcmt: 1,
               context: 'outstream',
-              context: 'outstream',
               minbitrate: 10,
               maxbitrate: 10,
               playerSize: [640, 480]
@@ -715,8 +676,6 @@ describe('PubMatic adapter', () => {
             expect(imp[0]).to.have.property('video').to.have.property('h');
           });
         });
-      }
-      if (FEATURES.NATIVE) {
       }
       if (FEATURES.NATIVE) {
         describe('NATIVE', () => {
@@ -1005,76 +964,6 @@ describe('PubMatic adapter', () => {
           });
         });
 
-        describe('Gzip Configuration', () => {
-          let configStub;
-          let bidderConfigStub;
-
-          beforeEach(() => {
-            configStub = sinon.stub(config, 'getConfig');
-            bidderConfigStub = sinon.stub(config, 'getBidderConfig');
-          });
-
-          afterEach(() => {
-            configStub.restore();
-            if (bidderConfigStub && bidderConfigStub.restore) {
-              bidderConfigStub.restore();
-            }
-          });
-
-          it('should enable gzip compression by default', () => {
-            // No specific configuration set, should use default
-            const request = spec.buildRequests(validBidRequests, bidderRequest);
-            expect(request.options.endpointCompression).to.be.true;
-          });
-
-          it('should respect bidder-specific boolean configuration set via setBidderConfig', () => {
-            // Mock bidder-specific config to return false
-            bidderConfigStub.returns({
-              pubmatic: {
-                gzipEnabled: false
-              }
-            });
-
-            const request = spec.buildRequests(validBidRequests, bidderRequest);
-            expect(request.options.endpointCompression).to.be.false;
-          });
-
-          it('should handle bidder-specific string configuration ("true")', () => {
-            bidderConfigStub.returns({
-              pubmatic: {
-                gzipEnabled: 'true'
-              }
-            });
-
-            const request = spec.buildRequests(validBidRequests, bidderRequest);
-            expect(request.options.endpointCompression).to.be.true;
-          });
-
-          it('should handle bidder-specific string configuration ("false")', () => {
-            bidderConfigStub.returns({
-              pubmatic: {
-                gzipEnabled: 'false'
-              }
-            });
-
-            const request = spec.buildRequests(validBidRequests, bidderRequest);
-            expect(request.options.endpointCompression).to.be.false;
-          });
-
-          it('should fall back to default when bidder-specific value is invalid', () => {
-            // Mock bidder-specific config to return invalid value
-            bidderConfigStub.returns({
-              pubmatic: {
-                gzipEnabled: 'invalid'
-              }
-            });
-
-            const request = spec.buildRequests(validBidRequests, bidderRequest);
-            // Should fall back to default (true)
-            expect(request.options.endpointCompression).to.be.true;
-          });
-        });
-
         it('should remove test if pubmaticTest is not set', () => {
           const request = spec.buildRequests(validBidRequests, bidderRequest);
           expect(request.data).to.have.property('test').to.equal(undefined);
@@ -1104,8 +993,6 @@ describe('PubMatic adapter', () => {
           expect(request.data).to.have.property('ext').to.have.property('wrapper').to.have.property('wiid');
           expect(request.data).to.have.property('ext').to.have.property('wrapper').to.have.property('wv');
           expect(request.data).to.have.property('ext').to.have.property('wrapper').to.have.property('wp');
-          expect(request.data).to.have.property('ext').to.have.property('wrapper').to.have.property('biddercode');
-          expect(request.data.ext.wrapper.biddercode).to.equal('pubmatic');
           expect(request.data).to.have.property('ext').to.have.property('wrapper').to.have.property('biddercode');
           expect(request.data.ext.wrapper.biddercode).to.equal('pubmatic');
         });
@@ -1261,7 +1148,6 @@ describe('PubMatic adapter', () => {
       describe('GPP', () => {
         it('should have gpp & gpp_sid in request if set using ortb2 and not present in request', () => {
           const copiedBidderRequest = utils.deepClone(bidderRequest);
-          const copiedBidderRequest = utils.deepClone(bidderRequest);
           copiedBidderRequest.ortb2.regs = {
             gpp: 'DBACNYA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YNN',
             gpp_sid: [5]
@@ -1280,16 +1166,12 @@ describe('PubMatic adapter', () => {
           datatopub: 2,
           transparency: [
             {
-            {
               domain: 'platform1domain.com',
               dsaparams: [1]
             },
             {
-            },
-            {
               domain: 'SSP2domain.com',
               dsaparams: [1, 2]
-            }
             }
           ]
         };
@@ -1412,65 +1294,7 @@ describe('PubMatic adapter', () => {
             ]
           });
         });
-        });
 
-        it('should invoke _calculateBidCpmAdjustment and correctly update cpmAdjustment currency is different', () => {
-          const bid = {
-            cpm: 2.5,
-            originalCpm: 3,
-            originalCurrency: 'USD',
-            currency: 'EUR',
-            mediaType: 'banner',
-            meta: { mediaType: 'banner' },
-            getCpmInNewCurrency: function(currency) {
-              return currency === 'EUR' ? 2.8 : this.cpm;
-            }
-          };
-          spec.onBidWon(bid);
-          expect(cpmAdjustment).to.deep.equal({
-            currency: 'USD',
-            originalCurrency: 'USD',
-            adjustment: [
-              {
-                cpmAdjustment: Number(((3 - 2.5) / 3).toFixed(2)), // Expected: 0.17
-                mediaType: 'banner',
-                metaMediaType: 'banner',
-                cpm: 2.5,
-                originalCpm: 3
-              }
-            ]
-          });
-        });
-
-        it('should replace existing adjustment entry if mediaType and metaMediaType match', () => {
-          const bid1 = {
-            cpm: 2.5,
-            originalCpm: 3,
-            originalCurrency: 'USD',
-            currency: 'USD',
-            mediaType: 'banner',
-            meta: { mediaType: 'banner' }
-          };
-          const bid2 = {
-            cpm: 1.5,
-            originalCpm: 2,
-            originalCurrency: 'USD',
-            currency: 'USD',
-            mediaType: 'banner',
-            meta: { mediaType: 'banner' }
-          };
-
-          spec.onBidWon(bid1);
-          // Should add the first entry
-          expect(cpmAdjustment.adjustment.length).to.equal(1);
-          expect(cpmAdjustment.adjustment[0].cpm).to.equal(2.5);
-          spec.onBidWon(bid2);
-          // Should replace the entry, not add a new one
-          expect(cpmAdjustment.adjustment.length).to.equal(1);
-          expect(cpmAdjustment.adjustment[0].cpm).to.equal(1.5);
-          expect(cpmAdjustment.adjustment[0].originalCpm).to.equal(2);
-        });
-      });
         it('should replace existing adjustment entry if mediaType and metaMediaType match', () => {
           const bid1 = {
             cpm: 2.5,
@@ -1504,105 +1328,6 @@ describe('PubMatic adapter', () => {
   });
 
   describe('Response', () => {
-    it('should parse native adm and set bidResponse.native, width, and height', () => {
-      // Prepare a valid native bidRequest
-      const bidRequest = utils.deepClone(validBidRequests[0]);
-      bidRequest.mediaTypes = {
-        native: {
-          title: { required: true, len: 140 }
-        }
-      };
-      delete bidRequest.mediaTypes.banner;
-      delete bidRequest.mediaTypes.video;
-      bidRequest.sizes = undefined;
-      const request = spec.buildRequests([bidRequest], bidderRequest);
-      // Prepare a valid native bid response with matching impid
-      const nativeAdm = JSON.stringify({ native: { assets: [{ id: 1, title: { text: 'Test' } }] } });
-      const nativeBid = {
-        id: 'bid-id',
-        impid: request.data.imp[0].id, // match the imp id
-        price: 1.2,
-        adm: nativeAdm,
-        w: 123,
-        h: 456,
-        adomain: ['example.com'],
-        mtype: 4 // NATIVE
-      };
-      const seatbid = [{ bid: [nativeBid] }];
-      const nativeResponse = { body: { seatbid } };
-      const bidResponses = spec.interpretResponse(nativeResponse, request);
-      expect(bidResponses).to.be.an('array');
-      expect(bidResponses[0]).to.exist;
-      expect(bidResponses[0].native).to.exist;
-      expect(bidResponses[0].width).to.equal(123);
-      expect(bidResponses[0].height).to.equal(456);
-    });
-
-    it('should handle invalid JSON in native adm gracefully', () => {
-      // Prepare a valid native bidRequest
-      const bidRequest = utils.deepClone(validBidRequests[0]);
-      bidRequest.mediaTypes = {
-        native: {
-          title: { required: true, len: 140 }
-        }
-      };
-      delete bidRequest.mediaTypes.banner;
-      delete bidRequest.mediaTypes.video;
-      bidRequest.sizes = undefined;
-      const request = spec.buildRequests([bidRequest], bidderRequest);
-
-      // Prepare a native bid response with invalid JSON and matching impid
-      const invalidAdm = '{ native: { assets: [ { id: 1, title: { text: "Test" } } ] }'; // missing closing }
-      const nativeBid = {
-        id: 'bid-id',
-        impid: request.data.imp[0].id, // match the imp id
-        price: 1.2,
-        adm: invalidAdm,
-        w: 123,
-        h: 456,
-        adomain: ['example.com'],
-        mtype: 4 // NATIVE
-      };
-      const seatbid = [{ bid: [nativeBid] }];
-      const nativeResponse = { body: { seatbid } };
-      const bidResponses = spec.interpretResponse(nativeResponse, request);
-      expect(bidResponses).to.be.an('array');
-      expect(bidResponses.length).to.equal(0); // No bid should be returned if adm is invalid
-    });
-
-    it('should set DEFAULT_WIDTH and DEFAULT_HEIGHT when bid.w and bid.h are missing for native', () => {
-      // Prepare a valid native bidRequest
-      const bidRequest = utils.deepClone(validBidRequests[0]);
-      bidRequest.mediaTypes = {
-        native: {
-          title: { required: true, len: 140 }
-        }
-      };
-      delete bidRequest.mediaTypes.banner;
-      delete bidRequest.mediaTypes.video;
-      bidRequest.sizes = undefined;
-      const request = spec.buildRequests([bidRequest], bidderRequest);
-      // Prepare a native bid response with missing w and h
-      const nativeAdm = JSON.stringify({ native: { assets: [{ id: 1, title: { text: 'Test' } }] } });
-      const nativeBid = {
-        id: 'bid-id',
-        impid: request.data.imp[0].id, // match the imp id
-        price: 1.2,
-        adm: nativeAdm,
-        // w and h are intentionally missing
-        adomain: ['example.com'],
-        mtype: 4 // NATIVE
-      };
-      const seatbid = [{ bid: [nativeBid] }];
-      const nativeResponse = { body: { seatbid } };
-      const bidResponses = spec.interpretResponse(nativeResponse, request);
-      expect(bidResponses).to.be.an('array');
-      expect(bidResponses[0]).to.exist;
-      expect(bidResponses[0].native).to.exist;
-      expect(bidResponses[0].width).to.equal(0);
-      expect(bidResponses[0].height).to.equal(0);
-    });
-
     it('should parse native adm and set bidResponse.native, width, and height', () => {
       // Prepare a valid native bidRequest
       const bidRequest = utils.deepClone(validBidRequests[0]);
@@ -1774,7 +1499,6 @@ describe('PubMatic adapter', () => {
       describe('VIDEO', () => {
         beforeEach(() => {
           const videoBidderRequest = utils.deepClone(bidderRequest);
-          const videoBidderRequest = utils.deepClone(bidderRequest);
           delete videoBidderRequest.bids[0].mediaTypes.banner;
           videoBidderRequest.bids[0].mediaTypes.video = {
             skip: 1,
@@ -1824,30 +1548,6 @@ describe('PubMatic adapter', () => {
           expect(bidResponse[0]).to.have.property('mediaType').to.equal('video');
           expect(bidResponse[0]).to.have.property('playerHeight').to.equal(480);
           expect(bidResponse[0]).to.have.property('playerWidth').to.equal(640);
-        });
-
-        it('should set renderer and rendererCode for outstream video with outstreamAU', () => {
-          const request = spec.buildRequests(validBidRequests, videoBidderRequest);
-          const bidResponse = spec.interpretResponse(videoResponse, request);
-          expect(bidResponse).to.be.an('array');
-          expect(bidResponse[0]).to.be.an('object');
-          expect(bidResponse[0]).to.have.property('renderer');
-          expect(bidResponse[0].renderer).to.be.an('object');
-          expect(bidResponse[0]).to.have.property('rendererCode').to.equal('outstreamAU');
-        });
-
-        it('should set width and height from playerWidth/playerHeight if not present in bid', () => {
-          // Clone and modify the video response to remove w and h
-          const modifiedVideoResponse = utils.deepClone(videoResponse);
-          delete modifiedVideoResponse.body.seatbid[0].bid[0].w;
-          delete modifiedVideoResponse.body.seatbid[0].bid[0].h;
-          // Set up the request as usual
-          const request = spec.buildRequests(validBidRequests, videoBidderRequest);
-          // Interpret the response
-          const bidResponses = spec.interpretResponse(modifiedVideoResponse, request);
-          // playerWidth = 640, playerHeight = 480 from playerSize in the test setup
-          expect(bidResponses[0].width).to.equal(640);
-          expect(bidResponses[0].height).to.equal(480);
         });
 
         it('should set renderer and rendererCode for outstream video with outstreamAU', () => {

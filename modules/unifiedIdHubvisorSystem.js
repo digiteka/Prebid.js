@@ -5,11 +5,10 @@
  * @requires module:modules/userId
  */
 
- import { logError } from '../src/utils.js';
- import {ajax} from '../src/ajax.js';
- import {submodule} from '../src/hook.js'
+import { logError } from '../src/utils.js';
+import { ajax } from '../src/ajax.js';
+import { submodule } from '../src/hook.js';
 
- 
 // import { logError } from 'prebid.js/src/utils.js';
 // import {ajax} from 'prebid.js/src/ajax.js';
 // import {submodule} from 'prebid.js/src/hook.js'
@@ -17,17 +16,17 @@
 const MODULE_NAME = 'unifiedId';
 
 const getUrl = (configParams, consentData) => {
- if (configParams.url) { return configParams.url; }
- const baseUrl = `https://match.adsrvr.org/track/rid?ttd_pid=${configParams.partner}&fmt=json&ttd_tpi=1`;
+  if (configParams.url) { return configParams.url; }
+  const baseUrl = `https://match.adsrvr.org/track/rid?ttd_pid=${configParams.partner}&fmt=json&ttd_tpi=1`;
 
- if (consentData) {
-   const gdpr = consentData.gdprApplies === true ? '1' : '0'
-   const gdprConsent = consentData.consentString ?? ''
-   return `${baseUrl}&gdpr=${gdpr}&gdpr_consent=${gdprConsent}`
- }
+  if (consentData) {
+    const gdpr = consentData.gdprApplies === true ? '1' : '0';
+    const gdprConsent = consentData.consentString ?? '';
+    return `${baseUrl}&gdpr=${gdpr}&gdpr_consent=${gdprConsent}`;
+  }
 
- return baseUrl
-}
+  return baseUrl;
+};
 
 /** @type {Submodule} */
 export const unifiedIdSubmodule = {
@@ -62,7 +61,7 @@ export const unifiedIdSubmodule = {
       return;
     }
 
-    const url = getUrl(configParams, consentData)
+    const url = getUrl(configParams, consentData);
 
     const resp = function (callback) {
       const callbacks = {
@@ -82,9 +81,9 @@ export const unifiedIdSubmodule = {
           callback();
         }
       };
-      ajax(url, callbacks, undefined, {method: 'GET', withCredentials: true});
+      ajax(url, callbacks, undefined, { method: 'GET', withCredentials: true });
     };
-    return {callback: resp};
+    return { callback: resp };
   },
   eids: {
     'tdid': {
