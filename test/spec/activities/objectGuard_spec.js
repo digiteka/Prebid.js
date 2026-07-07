@@ -147,7 +147,7 @@ describe('objectGuard', () => {
       guard.prop = val;
       expect(guard).to.eql({
         prop: val
-      })
+      });
     });
 
     it('should allow for deferred modification', () => {
@@ -171,8 +171,8 @@ describe('objectGuard', () => {
         prop: {
           val: 'foo'
         }
-      })
-    })
+      });
+    });
 
     it('should reject conflicting rules', () => {
       const crule = { ...rule, paths: ['outer'] };

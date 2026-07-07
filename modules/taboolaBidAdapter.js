@@ -3,7 +3,14 @@
 import { registerBidder } from '../src/adapters/bidderFactory.js';
 import { BANNER, NATIVE } from '../src/mediaTypes.js';
 import { config } from '../src/config.js';
-import { deepSetValue, getWindowSelf, replaceAuctionPrice, isArray, safeJSONParse, isPlainObject, getWinDimensions } from '../src/utils.js';
+import {
+  deepSetValue,
+  getWinDimensions,
+  getWindowSelf,
+  isPlainObject,
+  replaceAuctionPrice,
+  safeJSONParse
+} from '../src/utils.js';
 import { getStorageManager } from '../src/storageManager.js';
 import { ajax } from '../src/ajax.js';
 import { ortbConverter } from '../libraries/ortbConverter/converter.js';
@@ -11,6 +18,7 @@ import { getConnectionType } from '../libraries/connectionInfo/connectionUtils.j
 import { getViewportCoordinates } from '../libraries/viewport/viewport.js';
 import { percentInView } from '../libraries/percentInView/percentInView.js';
 import { getBoundingClientRect } from '../libraries/boundingClientRect/boundingClientRect.js';
+import { getAdUnitElement } from '../src/utils/adUnits.js';
 
 const BIDDER_CODE = 'taboola';
 const GVLID = 42;
@@ -75,7 +83,7 @@ export const userData = {
     if (!cookieData) {
       return undefined;
     }
-    const [, value = ''] = cookieData.split(`${key}=`)
+    const [, value = ''] = cookieData.split(`${key}=`);
     return value;
   },
   getFromLocalStorage() {
@@ -89,7 +97,7 @@ export const userData = {
   getFromTRC() {
     return window.TRC ? window.TRC.user_id : 0;
   }
-}
+};
 
 export const internal = {
   getPageUrl: (refererInfo = {}) => {
@@ -98,7 +106,7 @@ export const internal = {
   getReferrer: (refererInfo = {}) => {
     return refererInfo?.ref || getWindowSelf().document.referrer;
   }
-}
+};
 
 export function detectBot() {
   try {
@@ -140,9 +148,9 @@ export function getDeviceExtSignals(existingExt = {}) {
   };
 }
 
-export function getElementSignals(adUnitCode) {
+export function getElementSignals(bidRequest) {
   try {
-    const element = document.getElementById(adUnitCode);
+    const element = getAdUnitElement(bidRequest);
     if (!element) return null;
 
     const rect = getBoundingClientRect(element);
@@ -201,7 +209,7 @@ const converter = ortbConverter({
     if (bid.ext && bid.ext.dchain) {
       deepSetValue(bidResponse, 'meta.dchain', bid.ext.dchain);
     }
-    return bidResponse
+    return bidResponse;
   }
 });
 
@@ -247,57 +255,10 @@ export const spec = {
       return [];
     }
     const bids = [];
-    const fledgeAuctionConfigs = [];
     if (!serverResponse.body.seatbid || !serverResponse.body.seatbid.length || !serverResponse.body.seatbid[0].bid || !serverResponse.body.seatbid[0].bid.length) {
-      if (!serverResponse.body.ext || !serverResponse.body.ext.igbid || !serverResponse.body.ext.igbid.length) {
-        return [];
-      }
+      return [];
     } else {
       bids.push(...converter.fromORTB({ response: serverResponse.body, request: request.data }).bids);
-    }
-    if (isArray(serverResponse.body.ext?.igbid)) {
-      serverResponse.body.ext.igbid.forEach((igbid) => {
-        if (!igbid || !igbid.igbuyer || !igbid.igbuyer.length || !igbid.igbuyer[0].buyerdata) {
-          return;
-        }
-        const buyerdata = safeJSONParse(igbid.igbuyer[0]?.buyerdata)
-        if (!buyerdata) {
-          return;
-        }
-        const perBuyerSignals = {};
-        igbid.igbuyer.forEach(buyerItem => {
-          if (!buyerItem || !buyerItem.buyerdata || !buyerItem.origin) {
-            return;
-          }
-          const parsedData = safeJSONParse(buyerItem.buyerdata)
-          if (!parsedData || !parsedData.perBuyerSignals || !(buyerItem.origin in parsedData.perBuyerSignals)) {
-            return;
-          }
-          perBuyerSignals[buyerItem.origin] = parsedData.perBuyerSignals[buyerItem.origin];
-        });
-        const impId = igbid?.impid;
-        fledgeAuctionConfigs.push({
-          impId,
-          config: {
-            seller: buyerdata?.seller,
-            resolveToConfig: buyerdata?.resolveToConfig,
-            sellerSignals: {},
-            sellerTimeout: buyerdata?.sellerTimeout,
-            perBuyerSignals,
-            auctionSignals: {},
-            decisionLogicUrl: buyerdata?.decisionLogicUrl,
-            interestGroupBuyers: buyerdata?.interestGroupBuyers,
-            perBuyerTimeouts: buyerdata?.perBuyerTimeouts,
-          },
-        });
-      });
-    }
-
-    if (fledgeAuctionConfigs.length) {
-      return {
-        bids,
-        paapi: fledgeAuctionConfigs,
-      };
     }
     return bids;
   },
@@ -319,7 +280,7 @@ export const spec = {
     }
   },
   getUserSyncs: function(syncOptions, serverResponses, gdprConsent, uspConsent, gppConsent) {
-    const syncs = []
+    const syncs = [];
     const queryParams = [];
     if (gdprConsent) {
       queryParams.push(`gdpr=${Number(gdprConsent.gdprApplies && 1)}&gdpr_consent=${encodeURIComponent(gdprConsent.consentString || '')}`);
@@ -393,7 +354,7 @@ function getSiteProperties({ publisherId }, refererInfo, ortb2) {
     content: {
       language: navigator.language
     }
-  }
+  };
 }
 
 function fillTaboolaReqData(bidderRequest, bidRequest, data, context) {
@@ -414,7 +375,7 @@ function fillTaboolaReqData(bidderRequest, bidRequest, data, context) {
     data.user = {
       buyeruid: 0,
       ext: {}
-    }
+    };
   }
   if (extractedUserId && extractedUserId !== 0) {
     deepSetValue(data, 'user.buyeruid', extractedUserId);
@@ -422,7 +383,7 @@ function fillTaboolaReqData(bidderRequest, bidRequest, data, context) {
   if (data.regs?.ext === undefined || data.regs?.ext === null) {
     data.regs = {
       ext: {}
-    }
+    };
   }
   deepSetValue(data, 'regs.coppa', 0);
   if (gdprConsent.gdprApplies) {
@@ -501,7 +462,7 @@ function fillTaboolaImpData(bid, imp, context) {
   deepSetValue(imp, 'ext.prebid.bidderRequestsCount', bid.bidderRequestsCount);
   deepSetValue(imp, 'ext.prebid.bidderWinsCount', bid.bidderWinsCount);
 
-  const elementSignals = getElementSignals(bid.adUnitCode);
+  const elementSignals = getElementSignals(bid);
   if (elementSignals) {
     if (elementSignals.viewability !== undefined) {
       deepSetValue(imp, 'ext.viewability', elementSignals.viewability);

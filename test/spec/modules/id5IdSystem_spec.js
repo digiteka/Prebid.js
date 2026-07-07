@@ -853,8 +853,7 @@ describe('ID5 ID System', function () {
           ...deepClone(ID5_STORED_OBJ),
           ...id5PrebidResponse(ID5_JSON_RESPONSE, config)
         });
-    })
-    ;
+    });
 
     it('should call the ID5 server with ab_testing object when abTesting is turned on', async function () {
       const xhrServerMock = new XhrServerMock(server);
@@ -1076,10 +1075,7 @@ describe('ID5 ID System', function () {
       adUnits = [getAdUnitMock()];
       ortb2Fragments = {
         global: {}
-      }
-      ortb2Fragments = {
-        global: {}
-      }
+      };
     });
     afterEach(function () {
       events.getEvents.restore();
@@ -1356,7 +1352,7 @@ describe('ID5 ID System', function () {
         let config;
         beforeEach(function () {
           config = getId5FetchConfig();
-        })
+        });
         it('should properly decode from a stored object', function () {
           expect(id5System.id5IdSubmodule.decode(responseF(ID5_STORED_OBJ, config), config)).is.eql(expectedDecodedObject);
         });
@@ -1423,7 +1419,7 @@ describe('ID5 ID System', function () {
       } else {
         delete window.googletag;
       }
-      id5System.id5IdSubmodule._reset()
+      id5System.id5IdSubmodule._reset();
     });
 
     function verifyMultipleTagging(tagsObj) {
@@ -1450,15 +1446,15 @@ describe('ID5 ID System', function () {
 
     it('should not set GAM targeting if it is not enabled', function () {
       id5System.id5IdSubmodule.decode(storedObject, getId5FetchConfig());
-      expect(window.googletag.cmd).to.have.lengthOf(0)
-    })
+      expect(window.googletag.cmd).to.have.lengthOf(0);
+    });
 
     it('should not set GAM targeting if not returned from the server', function () {
       let config = utils.deepClone(getId5FetchConfig());
       config.params.gamTargetingPrefix = "id5";
       id5System.id5IdSubmodule.decode(storedObject, getId5FetchConfig());
-      expect(window.googletag.cmd).to.have.lengthOf(0)
-    })
+      expect(window.googletag.cmd).to.have.lengthOf(0);
+    });
 
     it('should set GAM targeting when tags returned if fetch response', function () {
       // Setup
@@ -1479,11 +1475,11 @@ describe('ID5 ID System', function () {
         'ab': 'n',
         'enrich': 'y'
       });
-    })
-  })
+    });
+  });
 
   describe('Decode should also expose targeting via id5tags if configured', function () {
-    let origId5tags, storedObject;
+    let storedObject;
     const exposeTargetingConfig = getId5FetchConfig();
     exposeTargetingConfig.params.gamTargetingPrefix = 'id5';
     exposeTargetingConfig.params.exposeTargeting = true;
@@ -1906,7 +1902,7 @@ describe('ID5 ID System', function () {
 function id5PrebidResponse(response, config, nbPage = undefined, otherResponse = undefined, otherConfig = undefined, nbPageOther = undefined) {
   const responseObj = {
     pbjs: {}
-  }
+  };
   responseObj.pbjs[config.params.partner] = deepClone(response);
   if (nbPage !== undefined) {
     responseObj.pbjs[config.params.partner].nbPage = nbPage;
@@ -1919,7 +1915,7 @@ function id5PrebidResponse(response, config, nbPage = undefined, otherResponse =
       responseObj.pbjs[otherConfig.params.partner].nbPage = nbPageOther;
     }
   }
-  return responseObj
+  return responseObj;
 }
 
 function oldStoredObject(response) {

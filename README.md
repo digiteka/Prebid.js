@@ -65,7 +65,7 @@ Working examples can be found in [the developer docs](https://prebid.org/dev-doc
 
 ### Customize build options
 
-If you're using Webpack, you can use the `prebid.js/customize/webpackLoader` loader to set the following options:
+Prebid.js allows you to set the following build options:
 
 | Name | Type | Description | Default | 
 | ---- | ---- | ----------- | ------- |
@@ -73,24 +73,8 @@ If you're using Webpack, you can use the `prebid.js/customize/webpackLoader` loa
 | defineGlobal | Boolean | If false, do not set a global variable | `true` | 
 | distUrlBase |  String | Base URL to use for dynamically loaded modules (e.g. debugging-standalone.js) | `"https://cdn.jsdelivr.net/npm/prebid.js/dist/chunks/"` |
 
-For example, to set a custom global variable name:
-
-```javascript
-// webpack.conf.js
-module.exports = {
-  module: {
-    rules: [
-      {
-        loader: 'prebid.js/customize/webpackLoader',
-        options: {
-          globalVarName: 'myCustomGlobal'
-        }
-      },
-    ]
-  }
-}
-```
-
+These options can be customized via the webpack loader or the Rollup-compatible plugin.
+For details and examples, see [Customize build options](customize/README.md).
 
 <a name="Install"></a>
 
@@ -313,3 +297,10 @@ The results will be in
 
 For instructions on writing tests for Prebid.js, see [Testing Prebid.js](https://prebid.org/dev-docs/testing-prebid.html).
 
+### Supported Browsers
+
+Prebid.js is supported on IE11 and modern browsers until 5.x. 6.x+ transpiles to target >0.25%; not dead. 11.21+ removes not dead and adds not ios_saf 11.
+
+### Governance
+Review our governance model [here](https://github.com/prebid/Prebid.js/tree/master/governance.md).
+### END
