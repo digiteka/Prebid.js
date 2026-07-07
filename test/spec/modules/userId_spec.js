@@ -321,6 +321,7 @@ describe('User ID', function () {
     });
 
     it('Check different cookies', async function () {
+    it('Check different cookies', async function () {
       let pubcid1;
       let pubcid2;
 
@@ -351,6 +352,7 @@ describe('User ID', function () {
     });
 
     it('Use existing cookie', async function () {
+    it('Use existing cookie', async function () {
       init(config);
       setSubmoduleRegistry([sharedIdSystemSubmodule]);
 
@@ -362,6 +364,7 @@ describe('User ID', function () {
       }]);
     });
 
+    it('Extend cookie', async function () {
     it('Extend cookie', async function () {
       let customConfig = getConfigMock(['pubCommonId', 'pubcid_alt', 'cookie']);
       customConfig = addConfig(customConfig, 'params', { extend: true });
@@ -379,6 +382,7 @@ describe('User ID', function () {
     });
 
     it('Disable auto create', async function () {
+    it('Disable auto create', async function () {
       let customConfig = getConfigMock(['pubCommonId', 'pubcid', 'cookie']);
       customConfig = addConfig(customConfig, 'params', { create: false });
 
@@ -386,6 +390,8 @@ describe('User ID', function () {
       setSubmoduleRegistry([sharedIdSystemSubmodule]);
 
       config.setConfig(customConfig);
+      const eids = await getGlobalEids();
+      expect(eids).to.not.exist;
       const eids = await getGlobalEids();
       expect(eids).to.not.exist;
     });
@@ -1926,6 +1932,7 @@ describe('User ID', function () {
       }
 
       it('test hook from pubcommonid cookie', async function () {
+      it('test hook from pubcommonid cookie', async function () {
         coreStorage.setCookie('pubcid', 'testpubcid', (new Date(Date.now() + 100000).toUTCString()));
 
         init(config);
@@ -1940,8 +1947,10 @@ describe('User ID', function () {
         } finally {
           coreStorage.setCookie('pubcid', '', EXPIRED_COOKIE_DATE);
         }
+        }
       });
 
+      it('test hook from pubcommonid html5', async function () {
       it('test hook from pubcommonid html5', async function () {
         // simulate existing browser local storage values
         localStorage.setItem('pubcid', 'testpubcid');
@@ -1961,8 +1970,10 @@ describe('User ID', function () {
           localStorage.removeItem('pubcid');
           localStorage.removeItem('pubcid_exp');
         }
+        }
       });
 
+      it('test hook from pubcommonid cookie&html5', async function () {
       it('test hook from pubcommonid cookie&html5', async function () {
         const expiration = new Date(Date.now() + 100000).toUTCString();
         coreStorage.setCookie('pubcid', 'testpubcid', expiration);
@@ -1984,8 +1995,10 @@ describe('User ID', function () {
           localStorage.removeItem('pubcid');
           localStorage.removeItem('pubcid_exp');
         }
+        }
       });
 
+      it('test hook from pubcommonid cookie&html5, no cookie present', async function () {
       it('test hook from pubcommonid cookie&html5, no cookie present', async function () {
         localStorage.setItem('pubcid', 'testpubcid');
         localStorage.setItem('pubcid_exp', new Date(Date.now() + 100000).toUTCString());
@@ -2004,8 +2017,10 @@ describe('User ID', function () {
           localStorage.removeItem('pubcid');
           localStorage.removeItem('pubcid_exp');
         }
+        }
       });
 
+      it('test hook from pubcommonid cookie&html5, no local storage entry', async function () {
       it('test hook from pubcommonid cookie&html5, no local storage entry', async function () {
         coreStorage.setCookie('pubcid', 'testpubcid', (new Date(Date.now() + 100000).toUTCString()));
 
@@ -2022,8 +2037,10 @@ describe('User ID', function () {
         } finally {
           coreStorage.setCookie('pubcid', '', EXPIRED_COOKIE_DATE);
         }
+        }
       });
 
+      it('test hook from pubcommonid config value object', async function () {
       it('test hook from pubcommonid config value object', async function () {
         init(config);
         setSubmoduleRegistry([sharedIdSystemSubmodule]);
@@ -2031,6 +2048,7 @@ describe('User ID', function () {
         expect(await getGlobalEids()).to.not.exist; // "pubcidvalue" is an un-known submodule for USER_IDS_CONFIG in eids.js
       });
 
+      it('test hook from pubProvidedId config params', async function () {
       it('test hook from pubProvidedId config params', async function () {
         init(config);
         setSubmoduleRegistry([pubProvidedIdSubmodule]);
@@ -2096,6 +2114,7 @@ describe('User ID', function () {
         });
       });
 
+      it('should add new id system ', async function () {
       it('should add new id system ', async function () {
         coreStorage.setCookie('pubcid', 'testpubcid', (new Date(Date.now() + 5000).toUTCString()));
 
@@ -2257,6 +2276,7 @@ describe('User ID', function () {
         });
 
         it('should check for enrichEids activity permissions', async () => {
+        it('should check for enrichEids activity permissions', async () => {
           isAllowed.callsFake((activity, params) => {
             return !(activity === ACTIVITY_ENRICH_EIDS &&
               params[ACTIVITY_PARAM_COMPONENT_TYPE] === MODULE_TYPE_UID &&
@@ -2311,6 +2331,7 @@ describe('User ID', function () {
         init(config);
         setSubmoduleRegistry([sharedIdSystemSubmodule]);
         config.mergeConfig(customCfg);
+        return runBidsHook(sinon.stub(), {}).then(() => {
         return runBidsHook(sinon.stub(), {}).then(() => {
           expect(utils.triggerPixel.called).to.be.false;
           return endAuction();
@@ -3216,6 +3237,7 @@ describe('User ID', function () {
             }
           }
         };
+        addIdData({ ortb2Fragments });
         addIdData({ ortb2Fragments });
 
         bidders.forEach((bidderName) => {
