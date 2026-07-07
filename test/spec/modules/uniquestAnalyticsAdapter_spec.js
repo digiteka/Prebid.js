@@ -1,9 +1,9 @@
 import uniquestAnalyticsAdapter from 'modules/uniquestAnalyticsAdapter.js';
-import {config} from 'src/config';
-import {EVENTS} from 'src/constants.js';
-import {server} from '../../mocks/xhr.js';
+import { config } from 'src/config';
+import { EVENTS } from 'src/constants.js';
+import { server } from '../../mocks/xhr.js';
 
-let events = require('src/events');
+const events = require('src/events');
 
 const SAMPLE_EVENTS = {
   AUCTION_END: {

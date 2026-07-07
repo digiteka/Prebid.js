@@ -55,10 +55,13 @@
             }
         ];
 
+
         var pbjs = pbjs || {};
         pbjs.que = pbjs.que || [];
 
+
     </script>
+
 
     <script>
         var googletag = googletag || {};
@@ -99,8 +102,11 @@
                 bidsBackHandler: sendAdserverRequest,
                 timeout: PREBID_TIMEOUT
             });
-            
+
+
         }); 
+
+
 
 
         function sendAdserverRequest() {
@@ -110,12 +116,15 @@
                 pbjs.que.push(function () {
                     pbjs.setTargetingForGPTAsync();
                     googletag.pubads().refresh();
-                    
+
+
                 });
             });
         }
 
+
     </script>
+
 
     <script>
         googletag.cmd.push(function () {
@@ -127,6 +136,8 @@
         });
 
 
+
+
         function sendAdserverRequest() {
             if (pbjs.adserverRequestSent) return;
             pbjs.adserverRequestSent = true;
@@ -134,7 +145,8 @@
                 pbjs.que.push(function () {
                     pbjs.setTargetingForGPTAsync();
                     googletag.pubads().refresh();
-                    
+
+
                 });
             });
         }

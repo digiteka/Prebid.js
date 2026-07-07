@@ -1,11 +1,13 @@
 import * as utils from "../src/utils.js";
+import { detectWalletsPresence } from "../libraries/cryptoUtils/wallets.js";
 import { registerBidder } from "../src/adapters/bidderFactory.js";
 import { BANNER, NATIVE } from "../src/mediaTypes.js";
 import { config } from "../src/config.js";
+import { getDomComplexity, getPageDescription, getPageTitle } from "../libraries/fpdUtils/pageInfo.js";
 import * as converter from '../libraries/ortbConverter/converter.js';
 
 const PREBID_VERSION = '$prebid.version$';
-const ADAPTER_VERSION = '1.0.1'; // 12.2025
+const ADAPTER_VERSION = '1.0.1';
 const ORTB = converter.ortbConverter({
   context: { ttl: 300 }
 });
@@ -14,64 +16,13 @@ const GVLID = `1393`;
 const ENDPOINT_URL = "https://req.adx.ws/prebid";
 const ACTION_METHOD = "POST";
 
-function detectWalletsPresence() {
-  const _wallets = [
-    "ethereum",
-    "web3",
-    "cardano",
-    "BinanceChain",
-    "solana",
-    "tron",
-    "tronLink",
-    "tronWeb",
-    "tronLink",
-    "starknet_argentX",
-    "walletLinkExtension",
-    "coinbaseWalletExtension",
-    "__venom",
-    "martian",
-    "razor",
-    "razorWallet",
-    "ic", // plug wallet,
-    "cosmos",
-    "ronin",
-    "starknet_braavos",
-    "XverseProviders",
-    "compass",
-    "solflare",
-    "solflareWalletStandardInitialized",
-    "sender",
-    "rainbow",
-  ];
-  return _wallets.some((prop) => typeof window[prop] !== "undefined") ? 1 : 0;
-}
+const detectAdType = (bid) =>
+  (
+    ["native", "banner"].find((t) => bid.mediaTypes?.[t]) || "unknown"
+  ).toUpperCase();
 
-function getPageTitle(win = window) {
-  try {
-    const ogTitle = win.top.document.querySelector('meta[property="og:title"]');
-    return win.top.document.title || (ogTitle && ogTitle.content) || '';
-  } catch (e) {
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    return document.title || (ogTitle && ogTitle.content) || '';
-  }
-}
-
-function getPageDescription(win = window) {
-  let element;
-
-  try {
-    element = win.top.document.querySelector('meta[name="description"]') ||
-      win.top.document.querySelector('meta[property="og:description"]')
-  } catch (e) {
-    element = document.querySelector('meta[name="description"]') ||
-      document.querySelector('meta[property="og:description"]')
-  }
-
-  return (element && element.content) || '';
-}
-
-function getDomComplexity(document) {
-  return document?.querySelectorAll('*')?.length ?? -1;
+const getReferrerInfo = (bidderRequest) => {
+  return bidderRequest?.refererInfo?.page ?? '';
 }
 
 const normalizeKeywords = (input) => {
@@ -92,13 +43,37 @@ const normalizeKeywords = (input) => {
   return [];
 };
 
-const detectAdType = (bid) =>
-  (
-    ["native", "banner"].find((t) => bid.mediaTypes?.[t]) || "unknown"
-  ).toUpperCase();
+function resolveDataType(asset) {
+  if (typeof asset?.data?.type === 'number') {
+    return asset.data.type;
+  }
 
-const getReferrerInfo = (bidderRequest) => {
-  return bidderRequest?.refererInfo?.page ?? '';
+  if (typeof asset?.id === 'number') {
+    return asset.id;
+  }
+
+  return null;
+}
+
+// Helper: resolve the "image type" for an asset
+// Returns 1 (icon), 3 (image) or null if unknown
+function resolveImageType(asset) {
+  if (!asset) return null;
+
+  // 1) explicit image type in the img block (preferred)
+  if (typeof asset.img?.type === 'number') return asset.img.type;
+
+  // 2) fallback to data.type (some bidders put the type here)
+  if (typeof asset.data?.type === 'number') return asset.data.type;
+
+  // 3) last resort: map legacy asset.id values to image types
+  //    (13 -> icon, 14 -> image) — keep this mapping isolated here
+  if (typeof asset.id === 'number') {
+    if (asset.id === 13) return 1; // icon
+    if (asset.id === 14) return 3; // image
+  }
+
+  return null;
 }
 
 const parseNativeAd = function (bid) {
@@ -112,7 +87,8 @@ const parseNativeAd = function (bid) {
       }
       if (asset.data) {
         const value = asset.data.value;
-        switch (asset.data.type) {
+        const type = resolveDataType(asset);
+        switch (type) {
           case 1: if (value) native.sponsored = value; break;
           case 2: if (value) native.desc = value; break;
           case 3: if (value) native.rating = value; break;
@@ -129,13 +105,14 @@ const parseNativeAd = function (bid) {
         }
       }
       if (asset.img) {
-        const { url, w = 0, h = 0, type } = asset.img;
+        const { url, w = 0, h = 0 } = asset.img;
+        const imgType = resolveImageType(asset);
 
-        if (type === 1 && url) {
+        if (imgType === 1 && url) {
           native.icon = url;
           native.icon_width = w;
           native.icon_height = h;
-        } else if (type === 3 && url) {
+        } else if (imgType === 3 && url) {
           native.image = url;
           native.image_width = w;
           native.image_height = h;
@@ -300,7 +277,7 @@ export const spec = {
             referenceId: bidRequest.params.referenceId,
             tagId: bidRequest.params.zone,
             type: detectAdType(bidRequest),
-            ...(isNative && { nativeRequest: { ver: "1.2", assets: processedAssets || {}} })
+            ...(isNative && { nativeRequest: { ver: "1.2", assets: processedAssets || {} } })
           },
         ],
         keywords: {

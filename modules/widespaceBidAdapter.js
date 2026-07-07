@@ -1,8 +1,9 @@
-import {config} from '../src/config.js';
-import {registerBidder} from '../src/adapters/bidderFactory.js';
-import {deepClone, parseQueryStringParameters, parseSizesInput} from '../src/utils.js';
-import {getStorageManager} from '../src/storageManager.js';
+import { config } from '../src/config.js';
+import { registerBidder } from '../src/adapters/bidderFactory.js';
+import { deepClone, parseQueryStringParameters, parseSizesInput } from '../src/utils.js';
+import { getStorageManager } from '../src/storageManager.js';
 import { getBoundingClientRect } from '../libraries/boundingClientRect/boundingClientRect.js';
+import { getConnectionInfo } from '../libraries/connectionInfo/connectionUtils.js';
 
 const BIDDER_CODE = 'widespace';
 const WS_ADAPTER_VERSION = '2.0.1';
@@ -11,7 +12,7 @@ const LS_KEYS = {
   LC_UID: 'wsLcuid',
   CUST_DATA: 'wsCustomData'
 };
-export const storage = getStorageManager({bidderCode: BIDDER_CODE});
+export const storage = getStorageManager({ bidderCode: BIDDER_CODE });
 
 let preReqTime = 0;
 
@@ -28,7 +29,7 @@ export const spec = {
   },
 
   buildRequests: function (validBidRequests, bidderRequest) {
-    let serverRequests = [];
+    const serverRequests = [];
     const REQUEST_SERVER_URL = getEngineUrl();
     const DEMO_DATA_PARAMS = ['gender', 'country', 'region', 'postal', 'city', 'yob'];
     const PERF_DATA = getData(LS_KEYS.PERF_DATA).map(perfData => JSON.parse(perfData));
@@ -44,7 +45,7 @@ export const spec = {
     }
 
     validBidRequests.forEach((bid, i) => {
-      let data = {
+      const data = {
         'screenWidthPx': screen && screen.width,
         'screenHeightPx': screen && screen.height,
         'adSpaceHttpRefUrl': getTopWindowReferrer(),
@@ -82,10 +83,10 @@ export const spec = {
       }
 
       // Include connection info if available
-      const CONNECTION = navigator.connection || navigator.webkitConnection;
-      if (CONNECTION && CONNECTION.type && CONNECTION.downlinkMax) {
-        data['netinfo.type'] = CONNECTION.type;
-        data['netinfo.downlinkMax'] = CONNECTION.downlinkMax;
+      const connection = getConnectionInfo();
+      if (connection?.type && connection.downlinkMax != null) {
+        data['netinfo.type'] = connection.type;
+        data['netinfo.downlinkMax'] = connection.downlinkMax;
       }
 
       // Include debug data when available
@@ -97,7 +98,7 @@ export const spec = {
 
       // GDPR Consent info
       if (data.gdprCmp) {
-        const {gdprApplies, consentString, vendorData} = bidderRequest.gdprConsent;
+        const { gdprApplies, consentString, vendorData } = bidderRequest.gdprConsent;
         const hasGlobalScope = vendorData && vendorData.hasGlobalScope;
         data.gdprApplies = gdprApplies ? 1 : gdprApplies === undefined ? '' : 0;
         data.gdprConsentData = consentString;
@@ -127,7 +128,7 @@ export const spec = {
   interpretResponse: function (serverResponse, request) {
     const responseTime = Date.now() - preReqTime;
     const successBids = serverResponse.body || [];
-    let bidResponses = [];
+    const bidResponses = [];
     successBids.forEach((bid) => {
       storeData({
         'perf_status': 'OK',
@@ -161,7 +162,7 @@ export const spec = {
     userSyncs = serverResponses.reduce((allSyncPixels, response) => {
       if (response && response.body && response.body[0]) {
         (response.body[0].syncPixels || []).forEach((url) => {
-          allSyncPixels.push({type: 'image', url});
+          allSyncPixels.push({ type: 'image', url });
         });
       }
       return allSyncPixels;
@@ -184,7 +185,7 @@ function storeData(data, name, stringify = true) {
 }
 
 function getData(name, remove = true) {
-  let data = [];
+  const data = [];
   return data;
 }
 

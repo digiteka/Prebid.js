@@ -30,17 +30,17 @@ describe('Dmd ID System', function () {
   });
 
   it('should log an error if configParams doesnot have api_key passed to getId', function () {
-    dmdIdSubmodule.getId({params: {}});
+    dmdIdSubmodule.getId({ params: {} });
     expect(logErrorStub.calledOnce).to.be.true;
   });
 
   it('should log an error if configParams has invalid api_key passed into getId', function () {
-    dmdIdSubmodule.getId({params: {api_key: 123}});
+    dmdIdSubmodule.getId({ params: { api_key: 123 } });
     expect(logErrorStub.calledOnce).to.be.true;
   });
 
   it('should not log an error if configParams has valid api_key passed into getId', function () {
-    dmdIdSubmodule.getId({params: {api_key: '3fdbe297-3690-4f5c-9e11-ee9186a6d77c'}});
+    dmdIdSubmodule.getId({ params: { api_key: '3fdbe297-3690-4f5c-9e11-ee9186a6d77c' } });
     expect(logErrorStub.calledOnce).to.be.false;
   });
 
@@ -53,12 +53,12 @@ describe('Dmd ID System', function () {
   });
 
   it('should return dmdId if valid dmd-dgid passed into decode', function () {
-    let data = { 'dmdId': 'U12345' };
+    const data = { 'dmdId': 'U12345' };
     expect(dmdIdSubmodule.decode('U12345')).to.deep.equal(data);
   });
 
   it('should return cacheObj if cacheObj is passed into getId', function () {
-    let data = { 'dmdId': 'U12345' };
+    const data = { 'dmdId': 'U12345' };
     expect(dmdIdSubmodule.getId(config, {}, { cookie: 'dmd-dgid' })).to.deep.equal({ cookie: 'dmd-dgid' });
     expect(server.requests.length).to.eq(0);
   });

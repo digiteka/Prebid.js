@@ -11,13 +11,13 @@
  * If publisher has not defined translation file than prebid will use default prebid translation file provided here //cdn.jsdelivr.net/gh/prebid/category-mapping-file@1/freewheel-mapping.json
  */
 
-import {config} from '../src/config.js';
-import {hook, setupBeforeHookFnOnce, ready} from '../src/hook.js';
-import {ajax} from '../src/ajax.js';
-import {logError, timestamp} from '../src/utils.js';
-import {addBidResponse} from '../src/auction.js';
-import {getCoreStorageManager} from '../src/storageManager.js';
-import {timedBidResponseHook} from '../src/utils/perfMetrics.js';
+import { config } from '../src/config.js';
+import { hook, setupBeforeHookFnOnce, ready } from '../src/hook.js';
+import { ajax } from '../src/ajax.js';
+import { logError, timestamp } from '../src/utils.js';
+import { addBidResponse } from '../src/auction.js';
+import { getCoreStorageManager } from '../src/storageManager.js';
+import { timedBidResponseHook } from '../src/utils/perfMetrics.js';
 
 export const storage = getCoreStorageManager('categoryTranslation');
 const DEFAULT_TRANSLATION_FILE_URL = 'https://cdn.jsdelivr.net/gh/prebid/category-mapping-file@1/freewheel-mapping.json';
@@ -44,7 +44,7 @@ export const getAdserverCategoryHook = timedBidResponseHook('categoryTranslation
     return fn.call(this, adUnitCode, bid, reject);
   }
 
-  let localStorageKey = (config.getConfig('brandCategoryTranslation.translationFile')) ? DEFAULT_IAB_TO_FW_MAPPING_KEY_PUB : DEFAULT_IAB_TO_FW_MAPPING_KEY;
+  const localStorageKey = (config.getConfig('brandCategoryTranslation.translationFile')) ? DEFAULT_IAB_TO_FW_MAPPING_KEY_PUB : DEFAULT_IAB_TO_FW_MAPPING_KEY;
 
   if (bid.meta && !bid.meta.adServerCatId) {
     let mapping = storage.getDataFromLocalStorage(localStorageKey);
