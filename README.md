@@ -38,9 +38,13 @@ Une fois le déploiement terminé, le fichier sera accessible sur
 * [Attendre que le build soit fait sur Amplify](https://eu-west-1.console.aws.amazon.com/amplify/apps/dnd6gr8veismm/branches/master/deployments)<br>
 * [Récupérer le fichier pbLibrary.js](https://master.dnd6gr8veismm.amplifyapp.com/build/dist/pbLibrary.js)<br>
 * L’uploader sur [Amazon S3](https://s3.console.aws.amazon.com/s3/buckets/s3-static.outstream.digiteka.com?region=eu-west-1) **en public** (Autorisation > Liste de contrôle d'accès)<br>
-* Modifier la version sur [CHEF](https://github.com/digiteka/dgchef/blob/master-ubuntu-1804/cookbooks/ultimedia/templates/default/services.yaml.erb)<br>
+
+* La version finale sera disponible sur [https://ot.digiteka.com/pbLibrary-X.X.X.js](https://ot.digiteka.com/pbLibrary-X.X.X.js)
+
+> A faire en supplément pour le player Legacy (qui utilise pbLibrary.js) : 
+> * Modifier la version sur [CHEF](https://github.com/digiteka/dgchef/blob/master-ubuntu-1804/cookbooks/ultimedia/templates/default/services.yaml.erb)<br>
 `prebidVersion: XXX` (l.13) (Numéro de version de Prebid si MAJ, sinon, version mineure (ex : 6.22.1) en cas d’ajout simple de module/adapter)
-* MEP dans le vide de la Delivery
+> * MEP dans le vide du repo UltimediaDelivery
 
 ---
 
