@@ -29,7 +29,8 @@
 
 * Vérifier la présence de `globalVarName: "pbjsDtk"` dans **Prebid/package.json**<br>
 * Pour un nouveau bidder à ajouter: màj de **Prebid/modules.json** + Player/Prebid:gvlIds<br>
-* S'assurer que `getVastXml()` dans **Prebid/videoCache.js** contient encore les modificiations Digiteka
+* S'assurer que `getVastXml()` dans **Prebid/videoCache.js** contient encore les modifications Digiteka
+* S'assurer que **Prebid/gulpfile.js** contient encore la ligne `var outputFileName = argv.bundleName ? argv.bundleName : 'pbLibrary.js';`
 
 Une fois le déploiement terminé, le fichier sera accessible sur
 [https://[nom-de-la-branche].dnd6gr8veismm.amplifyapp.com/build/dist/pbLibrary.js](https://[nom-de-la-branche].dnd6gr8veismm.amplifyapp.com/build/dist/pbLibrary.js)
