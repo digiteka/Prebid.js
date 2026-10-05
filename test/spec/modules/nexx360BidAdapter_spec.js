@@ -35,6 +35,34 @@ describe('Nexx360 bid adapter tests', () => {
     },
   };
 
+  describe('aliases gvlid mapping', () => {
+    // prismassp (Prisma Media) and scoremedia (Score Media Group) are white-label
+    // partners with their own GVL registrations, distinct from Nexx360's own
+    // GVL ID (965). Declaring the wrong gvlid on an alias makes Prebid's TCF
+    // consent/activity-control checks evaluate consent for the wrong vendor.
+    it('declares prismassp under Prisma Media\'s own GVL ID, not Nexx360\'s', () => {
+      const alias = spec.aliases.find((a) => a.code === 'prismassp');
+      expect(alias).to.exist;
+      expect(alias.gvlid).to.equal(1185);
+    });
+
+    it('declares scoremedia under Score Media Group\'s own GVL ID, not Nexx360\'s', () => {
+      const alias = spec.aliases.find((a) => a.code === 'scoremedia');
+      expect(alias).to.exist;
+      expect(alias.gvlid).to.equal(1090);
+    });
+
+    // stmbidder is the six-char-unique code for Stailamedia (bidstailamedia collides
+    // with bidstack on "bidsta"); both codes stay declared under Nexx360's GVL ID.
+    it('declares stmbidder alongside bidstailamedia under Nexx360\'s GVL ID', () => {
+      ['stmbidder', 'bidstailamedia'].forEach((code) => {
+        const alias = spec.aliases.find((a) => a.code === code);
+        expect(alias).to.exist;
+        expect(alias.gvlid).to.equal(965);
+      });
+    });
+  });
+
   describe('getGzipSetting', () => {
     let getParamStub;
     beforeEach(() => {

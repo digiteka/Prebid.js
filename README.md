@@ -64,7 +64,69 @@ Working examples can be found in [the developer docs](https://prebid.org/dev-doc
 - [Install](#Install)
 - [Build](#Build)
 - [Run](#Run)
+- [Agent tooling](#agent-tooling)
 - [Contribute](#Contribute)
+
+## Agent tooling
+
+Agents debugging a live Prebid.js page can use the repository's
+[`prebid-chrome-devtools` skill](.agents/skills/prebid-chrome-devtools/SKILL.md).
+It explains how to enable Chrome DevTools MCP's experimental third-party tools,
+discover the Prebid.js tool group, and inspect auctions, bids, events, floors,
+and cache eligibility. Invoke it as `$prebid-chrome-devtools` in clients that
+support repository-scoped agent skills.
+
+<a name="Usage"></a>
+
+## Usage (as a npm dependency)
+
+**Note**: versions prior to v10 required some Babel plugins to be configured when used as an NPM dependency -
+refer to [v9 README](https://github.com/prebid/Prebid.js/blob/9.43.0/README.md). See also [customize build options](#customize-options)
+
+```javascript
+import pbjs from 'prebid.js';
+import 'prebid.js/modules/rubiconBidAdapter'; // imported modules will register themselves automatically with prebid
+import 'prebid.js/modules/appnexusBidAdapter';
+pbjs.processQueue();  // required to process existing pbjs.queue blocks and setup any further pbjs.queue execution
+
+pbjs.requestBids({
+  ...
+})
+```
+
+You can import just type definitions for every module from `types.d.ts`, and for the `pbjs` global from `global.d.ts`:
+
+```typescript
+import 'prebid.js/types.d.ts';
+import 'prebid.js/global.d.ts';
+pbjs.que.push(/* ... */)
+```
+
+Or, if your Prebid bundle uses a different global variable name:
+
+```typescript
+import type {PrebidJS} from 'prebid.js/types.d.ts';
+declare global {
+    interface Window {
+        myCustomPrebidGlobal: PrebidJS;
+    }
+}
+```
+
+### TypeScript configuration
+
+Prebid's type definitions require TypeScript 5.6 or later, and the following `tsconfig.json` options:
+
+| Option | Value |
+| ------ | ----- |
+| `moduleResolution` | `bundler`, `node16`, or `nodenext`, with a `module` that is valid for it |
+| `target` | `ES2015` or later |
+| `lib` | if you set it explicitly, it must include `DOM` and `ES2015` or later; the default for the targets above already includes both |
+
+`moduleResolution: node10` is not supported - note that it is the default when `module` is `commonjs`.
+
+Installing `@types/google-publisher-tag` improves type checking where Prebid's types refer to GPT ad
+slots, such as the argument to `customGptSlotMatching`.
 
 <a id="customize-options"></a>
 
@@ -304,7 +366,7 @@ For instructions on writing tests for Prebid.js, see [Testing Prebid.js](https:/
 
 ### Supported Browsers
 
-Prebid.js is supported on IE11 and modern browsers until 5.x. 6.x+ transpiles to target >0.25%; not dead. 11.21+ removes not dead and adds not ios_saf 11.
+Prebid.js is supported on IE11 and modern browsers until 5.x. 6.x+ transpiles to target >0.25%; not dead. 11.22+ adds not ios_saf 11.
 
 ### Governance
 Review our governance model [here](https://github.com/prebid/Prebid.js/tree/master/governance.md).
